@@ -1,0 +1,176 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #2f588a, #2a5298); /* Dashboard background */
+  color: #ffffff;
+  animation: fadeIn 1s ease;
+}
+
+.profile-page {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 250px;
+  background: linear-gradient(120deg, #162447, #1f4068); /* Dashboard sidebar gradient */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeIn 1s ease;
+}
+
+.sidebar-logo img {
+  width: 150px;
+  margin-bottom: 30px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2)); /* Dashboard logo shadow */
+}
+
+.sidebar-nav {
+  width: 100%;
+}
+
+.nav-item {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  font-weight: bold;
+  color: #d1e8ff;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  text-align: center;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: linear-gradient(120deg, #4facfe, #00f2fe); /* Dashboard hover gradient */
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Main Content Styles */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+h1 {
+  color: #f9d342; /* Premium gold */
+  font-size: 28px;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease;
+}
+
+.profile-container {
+  background: linear-gradient(120deg, #1f4068, #162447); /* Dashboard card gradient */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  color: #ffffff;
+  animation: fadeInUp 1s ease;
+}
+
+/* Tabs */
+.profile-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-tabs button {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #aad6ff;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 16px;
+  transition: color 0.3s, border-bottom 0.3s;
+}
+
+.profile-tabs button:hover {
+  color: #4facfe; /* Dashboard hover color */
+}
+
+.active-tab {
+  border-bottom: 2px solid #f9d342; /* Premium gold */
+  font-weight: bold;
+  color: #f9d342;
+}
+
+/* Tab Content */
+.tab-content {
+  margin-top: 20px;
+}
+
+.tab-content h2 {
+  margin-bottom: 20px;
+  color: #aad6ff;
+  font-size: 20px;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #aad6ff;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.save-button {
+  background: linear-gradient(120deg, #4facfe, #00f2fe); /* Dashboard button gradient */
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.save-button:hover {
+  background: #f9d342; /* Premium gold hover */
+  color: #1f4068;
+  transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

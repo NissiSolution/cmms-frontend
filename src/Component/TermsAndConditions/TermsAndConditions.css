@@ -1,0 +1,54 @@
+.terms-conditions-page {
+    background-color: #f9f9f9;
+  }
+  
+  .terms-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .terms-content h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .terms-content p, .terms-content ul, .terms-content li {
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  .terms-content ul {
+    padding-left: 20px;
+  }
+  
+  .terms-content ul li {
+    margin-bottom: 10px;
+  }
+  
+  .terms-content h2 {
+    margin-top: 20px;
+    color: #007bff;
+  }
+  
+  .terms-content section {
+    margin-bottom: 30px;
+  }
+  
+  .terms-content a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .terms-content a:hover {
+    text-decoration: underline;
+  }
+  
+  .contact-section {
+    margin-top: 30px;
+  }
+  
+  .contact-section p {
+    margin: 5px 0;
+  }
+  
+  

@@ -1,0 +1,259 @@
+
+td{
+color: #1b2a4e;
+}
+.work-order-page {
+    padding: 20px;
+  }
+  th {
+    background-color: #1b2a4e; /* Dark blue background */
+    color: #ffffff; /* White text color */
+  }
+  
+  /* Table Cells */
+  td {
+    color: #1b2a4e; /* Dark blue text color */
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  
+  .add-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .work-order-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+  }
+  
+  .work-order-table th, .work-order-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .priority.low {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .priority.medium {
+    color: orange;
+    font-weight: bold;
+  }
+  
+  .priority.high {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .action-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+  
+  .action-btn.view {
+    color: #17a2b8;
+  }
+  
+  .action-btn.edit {
+    color: #ffc107;
+  }
+  
+  .action-btn.delete {
+    color: #dc3545;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+  }
+  
+  .modal label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .modal input, .modal select, .modal textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  /* WorkOrderPage.css */
+
+/* Container for Sidebar and Main Content */
+.work-order-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: inherit;
+  }
+  
+  /* Sidebar Styles (inherits SidebarComponent styles) */
+  .sidebar {
+    width: 250px;
+    background-color: #1b2a4e;
+    color: white;
+    min-height: 100vh;
+  }
+  
+  /* Main Content Styles */
+  .work-order-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    margin: 0;
+  }
+  
+  .add-btn {
+    padding: 10px 20px;
+    background-color: #1b2a4e;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .add-btn:hover {
+    background-color: #3b4b7d;
+  }
+  
+  /* Work Order Table */
+  .work-order-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .work-order-table th,
+  .work-order-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+ 
+  
+  .priority.low {
+    color: green;
+  }
+  
+  .priority.medium {
+    color: orange;
+  }
+  
+  .priority.high {
+    color: red;
+  }
+  
+  .action-btn {
+    margin: 0 20px;
+    padding: 2px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .action-btn.view {
+    color: blue;
+  }
+  
+  .action-btn.edit {
+    color: orange;
+  }
+  
+  .action-btn.delete {
+    color: red;
+  }
+  
+  /* Modal Overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+  }
+  
+
+  /* Styles for Filter Buttons */
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background-color: #1b2a4e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-btn:hover {
+  background-color: #3b4b7d;
+}
+
+.filter-btn.active {
+  background-color: #3b4b7d;
+  font-weight: bold;
+}
+.filter{
+  display: flex;
+  flex-direction: row-reverse;
+gap: 10px;
+margin-bottom: 10px;
+} 

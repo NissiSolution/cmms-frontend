@@ -1,0 +1,59 @@
+
+.Vendor-page {
+    display: flex;
+  }
+  
+  .vendor-list table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 20px;
+  }
+  
+  .vendor-list th,
+  .vendor-list td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+ /* Table Header */
+th {
+    background-color: #1b2a4e; /* Dark blue background */
+    color: #ffffff; /* White text color */
+  }
+  
+  /* Table Cells */
+  td {
+    color: #1b2a4e; /* Dark blue text color */
+  }
+  
+  .vendor-list th {
+    background-color: #1b2a4e;
+    color: white;
+  }
+  
+  .action-btn {
+    margin: 0 5px;
+    padding: 5px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+  }
+  
+  .action-btn.view {
+    color: #17a2b8;
+  }
+  
+  .action-btn.edit {
+    color: #ffc107;
+  }
+  
+  .action-btn.delete {
+    color: #dc3545;
+  }
+  
+  img {
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
