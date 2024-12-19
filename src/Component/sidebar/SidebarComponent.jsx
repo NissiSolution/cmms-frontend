@@ -1,11 +1,10 @@
 // SidebarComponent.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import logo from '../img/logo.png';
 import './SidebarComponent.css'; // Styles specific to Sidebar
 
 const SidebarComponent = () => {
-  const [isStaffMenuOpen, setIsStaffMenuOpen] = useState(false); // Dropdown menu state
 
   return (
     <aside className="sidebar">
@@ -17,24 +16,9 @@ const SidebarComponent = () => {
           Dashboard
         </NavLink>
 
-        <div>
-          <div
-            className={`nav-item nav-staff${isStaffMenuOpen ? 'active' : ''}`}
-            onClick={() => setIsStaffMenuOpen(!isStaffMenuOpen)}
-            activeClassName="active"   >
-            Staff
-          </div>
-          {isStaffMenuOpen && (
-            <div className="submenu">
-              <NavLink to="/staff/users" activeClassName="active" className="nav-item">
-                Users
-              </NavLink>
-              <NavLink to="/staff/roles" activeClassName="active" className="nav-item">
-                Roles
-              </NavLink>
-            </div>
-          )}
-        </div>
+        <NavLink to="/employee" activeClassName="active" className="nav-item">
+          Employee
+        </NavLink>
 
         <NavLink to="/location" activeClassName="active" className="nav-item">
           Location
@@ -42,18 +26,19 @@ const SidebarComponent = () => {
         <NavLink to="/work-order" activeClassName="active" className="nav-item">
           Work Order
         </NavLink>
+        <div className="inventory">
+          Inventory
+        </div>
         <NavLink to="/assets" activeClassName="active" className="nav-item">
-          Assets
+          View
         </NavLink>
         <NavLink to="/parts" activeClassName="active" className="nav-item">
           Parts
         </NavLink>
-       
+       <div></div>
         <NavLink to="/vendor" activeClassName="active" className="nav-item">
           Vendor
         </NavLink>
-       
-        
       </nav>
     </aside>
   );

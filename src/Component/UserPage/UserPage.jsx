@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import SidebarComponent from '../sidebar/SidebarComponent';
+
 import './UserPage.css';
 const UserPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [users, setUsers] = useState([
     { name: 'Paul', email: 'paul@example.com', role: 'Member' },
     { name: 'Phillip', email: 'xosywimok@mailinator.com', role: 'Member' },
@@ -10,9 +12,7 @@ const UserPage = () => {
   ]);
   // Form input state
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+   name:'',email:'',
     role: 'Role-1',
   });
 
@@ -29,13 +29,13 @@ const UserPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newUser = {
-      name: `${formData.firstName} ${formData.lastName}`,
+      name: `${formData.name}`,
       email: formData.email,
       role: formData.role,
     };
     setUsers([...users, newUser]); // Add new user to the state
     setIsModalOpen(false); // Close the modal
-    setFormData({ firstName: '', lastName: '', email: '', role: 'Role-1' }); // Reset form
+    setFormData({ name:'',email: '', role: 'Role-1' }); // Reset form
   };
 
   return (
@@ -53,7 +53,7 @@ const UserPage = () => {
         <section className="user-cards">
           {users.map((user, index) => (
             <div className="user-card" key={index}>
-              <p className="user-role">{user.role}</p>
+              <p className="user-role">Member</p>
               <p className="user-name">{user.name}</p>
               <p className="user-email">{user.email}</p>
             </div>
@@ -71,27 +71,17 @@ const UserPage = () => {
             <h2>Create New User</h2>
             <form onSubmit={handleSubmit}>
               <label>
-                First Name*
+               Name*
                 <input
                   type="text"
-                  name="firstName"
-                  value={formData.firstName}
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter First Name"
+                  placeholder="EnterName"
                   required
                 />
               </label>
-              <label>
-                Last Name*
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Enter Last Name"
-                  required
-                />
-              </label>
+           
               <label>
                 Email*
                 <input

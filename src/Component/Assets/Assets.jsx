@@ -155,12 +155,7 @@ const Assets = () => {
                     >
                       ✏️ Edit
                     </button>
-                    <button
-                      className="action-btn delete"
-                      onClick={() => handleDelete(index)}
-                    >
-                      🗑️ Delete
-                    </button>
+                   
                   </td>
                 </tr>
               ))}

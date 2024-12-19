@@ -14,7 +14,9 @@
 .roles-list {
   width: 100%;
 }
-
+.name-role{
+  color: whitesmoke;
+}
 table {
   width: 100%;
   border-collapse: collapse;
@@ -38,7 +40,6 @@ th {
   border-radius: 5px;
   display: inline-block;
 }
-
 .actions button {
   margin-top: 10px;
   border: none;

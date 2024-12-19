@@ -44,6 +44,7 @@
     ]
   },
   "devDependencies": {
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "webpack-obfuscator": "^3.5.1"
   }
 }

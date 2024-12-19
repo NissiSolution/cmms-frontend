@@ -88,7 +88,7 @@ const RolesPage = () => {
             <tbody>
               {roles.map((role, index) => (
                 <tr key={index}>
-                  <td>{role.name}</td>
+                  <td className='name-role'>{role.name}</td>
                   <td>
                     {role.permissions.map((perm, i) => (
                       <span key={i} className="permission-tag">

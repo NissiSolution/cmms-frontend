@@ -2,27 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import axios from 'axios';
+import { useDispatch } from "react-redux";
+import { setUsers,setAllUsers } from '../../store/slice';
 import logoImage from './logo.png';
-
 const Login = () => {
   const navigate = useNavigate();
-
+  const dispatch =useDispatch()
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false); // State for loading spinner
-
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
     setError('');
+
     setLoading(true); // Show loading spinner
-    
     try {
 
-      const user = data.find((user) => user.email === email && user.password === password);
+      const user = data?.find((user) => user.email === email && user.password === password);
       if (user) {
         localStorage.setItem('userRole', user.role);
+        dispatch(setUsers(user))
+        dispatch(setAllUsers(data.find(user=>user.role==='user')))
         navigate('/dashboard');
       } else {
         setError('Invalid email or password');
@@ -36,7 +38,6 @@ const Login = () => {
   };
 
   const getDate = async () => {
-    setLoading(true);
     try {
       const response = await axios.get("https://cmms-backend-g16v.onrender.com/api/get", {
         headers: { 'Cache-Control': 'no-cache' },
@@ -50,7 +51,6 @@ const Login = () => {
     }
   };
   
-console.log(data);
 
   useEffect(() => {
     getDate();

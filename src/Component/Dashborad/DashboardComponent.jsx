@@ -1,11 +1,12 @@
 import React, { useState,useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { NavLink } from 'react-router-dom';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import './DashboardComponent.css';
-import logo from '../img/logo.png';
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { clearUsers } from '../../store/slice';
 import { Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -18,6 +19,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import SidebarComponent from '../sidebar/SidebarComponent';
 
 // Register the required Chart.js components
 ChartJS.register(
@@ -32,9 +34,11 @@ ChartJS.register(
 );
 
 const DashboardComponent = () => {
-  const [isStaffMenuOpen, setIsStaffMenuOpen] = useState(false); // State to manage Staff menu dropdown
   const [isProfileOpen,setIsProfileOpen]=useState(false)
   const [role, setRole] = useState('');
+  const userValue = useSelector((state) => state.user.users)
+  const dispatch =useDispatch()
+
   const lineChartData = {
     labels: ['April', 'May', 'June', 'July', 'August', 'September'],
     datasets: [
@@ -47,10 +51,7 @@ const DashboardComponent = () => {
       },
     ],
   };
-  useEffect(() => {
-    const userRole = localStorage.getItem('userRole'); // Assuming role is stored as 'role'
-    setRole(userRole);
-  }, []);
+;
   
   const doughnutChartData = {
     labels: ['Pending', 'Complete'],
@@ -64,66 +65,24 @@ const DashboardComponent = () => {
       },
     ],
   };
-  
+  useEffect(()=>{
+    setRole(userValue?.role)
+
+  })
   
   const navigate = useNavigate(); // React Router's navigation function
 
   const handleLogout = () => {
     // Clear user session (e.g., clear tokens or local storage)
-    localStorage.clear();
     // Redirect to login page
+    dispatch(clearUsers)
+
     navigate('/');
   };
 
   return (
     <div className="dashboard-page">
-      {/* Sidebar */}
-      <aside className="sidebar">
-  <div className="sidebar-logo">
-    <img src={logo} alt="NissiLogo" />
-  </div>
-  <nav className="sidebar-nav">
-    <NavLink to="/dashboard" activeClassName="active" className="nav-item">
-      Dashboard
-    </NavLink>
- 
-    <div>
-      <div
-        className={`nav-item ${isStaffMenuOpen ? 'active' : ''}`}
-        onClick={() => setIsStaffMenuOpen(!isStaffMenuOpen)}
-        activeClassName="active" >
-        Staff
-      </div>
-      {isStaffMenuOpen && (
-        <div className="submenu">
-          <NavLink to="/staff/users" activeClassName="active" className="nav-item">
-            Users
-          </NavLink>
-          <NavLink to="/staff/roles" activeClassName="active" className="nav-item">
-            Roles
-          </NavLink>
-        </div>
-      )}
-    </div>
-    <NavLink to="/location" activeClassName="active" className="nav-item">
-      Location
-    </NavLink>
-    <NavLink to="/work-order" activeClassName="active" className="nav-item">
-      Work Order
-    </NavLink>
-    <NavLink to="/assets" activeClassName="active" className="nav-item">
-      Assets
-    </NavLink>
-    <NavLink to="/parts" activeClassName="active" className="nav-item">
-      Parts
-    </NavLink>
-    
-    <NavLink to="/vendor" activeClassName="active" className="nav-item">
-      Vendor
-    </NavLink>
- 
-  </nav>
-</aside>
+   <SidebarComponent/>
 
       {/* Main Content */}
       <main className="main-content">
@@ -137,7 +96,7 @@ const DashboardComponent = () => {
       onClick={() => setIsProfileOpen(!isProfileOpen)}
       style={{ cursor: 'pointer' }}
     >
-      {role} ▽
+      {role||`company`} ▽
     </div>
     {isProfileOpen && (
       <ul className="dropdown-menu">
@@ -159,10 +118,6 @@ const DashboardComponent = () => {
               <div className="stat-card">
                 <h3>Total Users</h3>
                 <p>3 Users</p>
-              </div>
-              <div className="stat-card">
-                <h3>Total Orders</h3>
-                <p>72 Orders</p>
               </div>
               <div className="stat-card">
                 <h3>Most Purchased Plan</h3>
