@@ -9,14 +9,13 @@ const Register = () => {
     name: '', email: '', password: '', role: ''
   });
   const [loading, setLoading] = useState(false);  // Loading state
-  const [error, setError] = useState(null);     // Error state
 const navigate=useNavigate()
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);  // Start loading
 
     try {
-      const response = await axios.post("https://cmms-backend-g16v.onrender.com/api/post", data, {
+      const response = await axios.post("https://cmms-backend-1.onrender.com/api/post", data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -26,7 +25,6 @@ const navigate=useNavigate()
        navigate('/')
     } catch (err) {
       console.error(err);
-      setError(err);  // Handle error
     } finally {
       setLoading(false);  // End loading
     }

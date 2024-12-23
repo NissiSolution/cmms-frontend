@@ -1,37 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // For API calls
 import SidebarComponent from "../sidebar/SidebarComponent";
 import "./Vendor.css";
+import { FaEye,  FaTrashAlt } from 'react-icons/fa'; // Icons
 
 const Vendor = () => {
+  const [vendors, setVendors] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [vendors, setVendors] = useState([
-    {
-      id: 1,
-      name: "William",
-      email: "nibefa6957@chimpad.com",
-      phone: "9876320145",
-      image: "https://i.pravatar.cc/52?img=18",
-    },
-    {
-      id: 2,
-      name: "Keneth",
-      email: "tepac35577@galotv.com",
-      phone: "+1 (361) 717-1194",
-      image: "https://i.pravatar.cc/50?img=33",
-    },
-    {
-      id: 3,
-      name: "Juliet Cunningham",
-      email: "Juliet@example.com",
-      phone: "+1 (122) 622-1039",
-      image: "https://i.pravatar.cc/50?img=48",
-    },
-  ]);
-
   const [currentVendor, setCurrentVendor] = useState({});
   const [editIndex, setEditIndex] = useState(null);
 
+  // Fetch vendors on component mount
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const fetchVendors = async () => {
+    try {
+      const response = await axios.get('https://cmms-backend-1.onrender.com/api/vendor/get');
+      setVendors(response.data);
+    } catch (error) {
+      console.error('Error fetching vendors:', error);
+    }
+  };
+  
   const openModal = (vendor = {}, index = null) => {
     setCurrentVendor(vendor);
     setEditIndex(index);
@@ -51,51 +44,40 @@ const Vendor = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-  
-    // For file input (image upload)
-    if (name === "thumbnail" && files && files[0]) {
-      const file = files[0];
-      const fileURL = URL.createObjectURL(file); // Generate a temporary URL
-      setCurrentVendor((prev) => ({
-        ...prev,
-        thumbnail: fileURL,
-      }));
-    } else {
-      // For other inputs
-      setCurrentVendor((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    const { name, value } = e.target;
+    setCurrentVendor((prev) => ({ ...prev, [name]: value }));
   };
-  
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedVendors = [...vendors];
-
-    if (editIndex !== null) {
-      updatedVendors[editIndex] = currentVendor;
-    } else {
-      updatedVendors.push({
-        ...currentVendor,
-        id: Date.now(),
-      });
+    try {
+      if (editIndex !== null) {
+        // Update vendor logic
+        // Assuming updateVendor API exists
+        await axios.put(`https://cmms-backend-1.onrender.com/api/vendor/${currentVendor.id}`, currentVendor);
+      } else {
+        // Add new vendor
+        await axios.post('https://cmms-backend-1.onrender.com/api/vendor/post', currentVendor);
+      }
+      fetchVendors(); // Refresh the list
+      closeModal();
+    } catch (error) {
+      console.error('Error saving vendor:', error);
     }
-
-    setVendors(updatedVendors);
-    closeModal();
   };
 
-  const handleDelete = (index) => {
-    const updatedVendors = vendors.filter((_, i) => i !== index);
-    setVendors(updatedVendors);
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`https://cmms-backend-1.onrender.com/api/vendors/dlt/${id}`);
+      fetchVendors(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting vendor:', error);
+    }
   };
 
   return (
     <div className="Vendor-page">
       <SidebarComponent />
-
       <div className="main-content">
         <header className="header">
           <h1>Vendors</h1>
@@ -104,12 +86,10 @@ const Vendor = () => {
           </button>
         </header>
 
-        {/* Table */}
         <div className="vendor-list">
           <table>
             <thead>
               <tr>
-                <th>Image</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -119,34 +99,16 @@ const Vendor = () => {
             <tbody>
               {vendors.map((vendor, index) => (
                 <tr key={vendor.id}>
-                  <td>
-                    <img
-                      src={vendor.image}
-                      alt={vendor.name}
-                      style={{ width: "50px", height: "50px", borderRadius: "5px" }}
-                    />
-                  </td>
                   <td>{vendor.name}</td>
                   <td>{vendor.email}</td>
                   <td>{vendor.phone}</td>
                   <td>
-                    <button
-                      className="action-btn view"
-                      onClick={() => openViewModal(vendor)}
-                    >
-                      👁️ View
+                    <button className="action-btn view" onClick={() => openViewModal(vendor)}>
+                      <FaEye />
                     </button>
-                    <button
-                      className="action-btn edit"
-                      onClick={() => openModal(vendor, index)}
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button
-                      className="action-btn delete"
-                      onClick={() => handleDelete(index)}
-                    >
-                      🗑️ Delete
+
+                    <button className="action-btn delete" onClick={() => handleDelete(vendor.id)}>
+                      <FaTrashAlt />
                     </button>
                   </td>
                 </tr>
@@ -192,16 +154,6 @@ const Vendor = () => {
                   required
                 />
               </label>
-             
-              <label>
-  Image
-  <input
-    type="file"
-    name="image"
-    accept="image/png, image/gif, image/jpg, image/jpeg"
-    onChange={handleInputChange}
-  />
-</label>
               <div className="modal-actions">
                 <button type="button" onClick={closeModal}>
                   Close
@@ -218,20 +170,9 @@ const Vendor = () => {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Vendor Details</h2>
-            <p>
-              <strong>Name:</strong> {currentVendor.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {currentVendor.email}
-            </p>
-            <p>
-              <strong>Phone:</strong> {currentVendor.phone}
-            </p>
-            <img
-              src={currentVendor.image}
-              alt={currentVendor.name}
-              style={{ width: "150px", borderRadius: "5px" }}
-            />
+            <p><strong>Name:</strong> {currentVendor.name}</p>
+            <p><strong>Email:</strong> {currentVendor.email}</p>
+            <p><strong>Phone:</strong> {currentVendor.phone}</p>
             <div className="modal-actions">
               <button onClick={closeModal}>Close</button>
             </div>

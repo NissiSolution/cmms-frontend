@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import SidebarComponent from '../sidebar/SidebarComponent';
 import './LocationPage.css';
+import { FaEdit } from 'react-icons/fa'; // Edit icon
+import { FaTrashAlt } from 'react-icons/fa'; // Delete icon
 
 const LocationPage = () => {
   const [locations, setLocations] = useState([
@@ -76,10 +78,10 @@ const LocationPage = () => {
                 <td>{location.address}</td>
                 <td>
                   <button className="action-btn edit" onClick={() => openModal(location, index)}>
-                    ✏️
+                    <FaEdit /> Edit
                   </button>
                   <button className="action-btn delete" onClick={() => handleDelete(index)}>
-                    🗑️
+                    <FaTrashAlt /> Delete
                   </button>
                 </td>
               </tr>
@@ -129,4 +131,3 @@ const LocationPage = () => {
 };
 
 export default LocationPage;
-    

@@ -11,13 +11,15 @@
     padding: 20px;
   }
   
-  .header {
+ .employee-page .main-content .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
-  
+  .att-btn{
+ margin-left: 40px;
+  }
   .add-btn {
     background-color: #007bff;
     color: white;
@@ -50,9 +52,13 @@
   
   .employee-table th {
     background-color: #1b2a4e;
+    background-color: #1b2a4e;
     color: white;
   }
-  
+  th{
+    background-color: #1b2a4e;
+
+  }
   .edit-btn,
   .delete-btn {
     padding: 5px 10px;
@@ -125,4 +131,27 @@
     background-color: #007bff;
     color: white;
   }
+  .attendance-btn{
+   border: none; 
+   background-color: transparent;
+   cursor: pointer;
+   color: #dc3545;
+   margin-left: 2px;
+  }
+  .attendance-options {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-around;
+  }
   
+  .attendance-options label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .attendance-options input {
+    margin-right: 5px;
+  }
+  
+ 
