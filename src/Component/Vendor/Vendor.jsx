@@ -18,7 +18,7 @@ const Vendor = () => {
 
   const fetchVendors = async () => {
     try {
-      const response = await axios.get('https://cmms-backend-1.onrender.com/api/vendor/get');
+      const response = await axios.get('https://cmms-backend-1.onrender.com/api/vendors/get');
       setVendors(response.data);
     } catch (error) {
       console.error('Error fetching vendors:', error);
@@ -54,10 +54,10 @@ const Vendor = () => {
       if (editIndex !== null) {
         // Update vendor logic
         // Assuming updateVendor API exists
-        await axios.put(`https://cmms-backend-1.onrender.com/api/vendor/${currentVendor.id}`, currentVendor);
+        await axios.put(`https://cmms-backend-1.onrender.com/api/vendors/${currentVendor.id}`, currentVendor);
       } else {
         // Add new vendor
-        await axios.post('https://cmms-backend-1.onrender.com/api/vendor/post', currentVendor);
+        await axios.post('https://cmms-backend-1.onrender.com/api/vendors/post', currentVendor);
       }
       fetchVendors(); // Refresh the list
       closeModal();

@@ -82,7 +82,7 @@
     color: white;
   }
   
-  .delete-btn:hover {
+  .delete-btn:hover ,.attendance-btn:hover{
     background-color: #c82333;
   }
   
@@ -132,11 +132,15 @@
     color: white;
   }
   .attendance-btn{
-   border: none; 
-   background-color: transparent;
+   
+   background-color: #dc3545;
    cursor: pointer;
-   color: #dc3545;
    margin-left: 2px;
+   padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
   }
   .attendance-options {
     margin-top: 15px;

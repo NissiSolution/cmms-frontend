@@ -16,6 +16,7 @@ import Vendor from './Component/Vendor/Vendor';
 import AboutUs from './Component/About/AboutUs';
 import PrivacyPolicy from './Component/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Component/TermsAndConditions/TermsAndConditions';
+import Add from './Component/AddStock/Add';
 function App() {
   return (
     <Router>
@@ -34,8 +35,9 @@ function App() {
         <Route path='/staff/roles' element={<RolesPage/>}/>
         <Route path='/location' element={<LocationPage/>}></Route>
         <Route path='/work-order' element={<WorkOrderPage/>}/>
-      <Route path='/assets' element={<Assets/>}/>
-      <Route path='/parts' element={<PartsPage/>}/>
+      <Route path='/stock' element={<Assets/>}/>
+      <Route path='/add-stock' element={<Add/>}/>
+      <Route path='/stock-out' element={<PartsPage/>}/>
       <Route path='/vendor' element={<Vendor/>}/>
       </Routes>
     </Router>

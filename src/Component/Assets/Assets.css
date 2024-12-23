@@ -42,15 +42,18 @@ td {
 .assets-list table {
   width: 100%;
   border-collapse: collapse;
+  border: none;
   margin-top: 20px;
 }
 
 .assets-list th, .assets-list td {
-  border: 1px solid #ddd;
-  padding: 10px;
+  border: none;
+  padding: 7px;
   text-align: center;
 }
-
+.assets-list th{
+  padding: 9px;
+}
 .assets-list img {
   object-fit: cover;
 }

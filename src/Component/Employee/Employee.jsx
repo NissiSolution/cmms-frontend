@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Employee.css';
 import SidebarComponent from '../sidebar/SidebarComponent';
-import { FaEdit } from 'react-icons/fa';
 import axios from 'axios';
 
 const Employee = () => {
@@ -34,7 +33,7 @@ const [selectedDate, setSelectedDate] = useState('');
     };
 
     fetchEmployees();
-  }, [employees,isModalOpen,isAttendancePopupOpen]);
+  }, [employees]);
 
   const fetchRecentWorkOrders = async () => {
     try {
@@ -195,7 +194,7 @@ const [selectedDate, setSelectedDate] = useState('');
                         className="edit-btn"
                         onClick={() => openModal(employee, index)}
                       >
-                        <FaEdit />
+                        Edit
                       </button>
                       <button
                         className="attendance-btn"

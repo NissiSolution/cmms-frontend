@@ -29,11 +29,12 @@ const SidebarComponent = () => {
         <div className="inventory">
           Inventory
         </div>
-        <NavLink to="/assets" activeClassName="active" className="nav-item">
-          View
+        <NavLink to="/stock" activeClassName="active" className="nav-item">
+          Stock
         </NavLink>
-        <NavLink to="/parts" activeClassName="active" className="nav-item">
-          Parts
+        <NavLink to="/add-stock" activeClassName="active" className="nav-item">Add Stock</NavLink>
+        <NavLink to="/stock-out" activeClassName="active" className="nav-item">
+          Out-Stock
         </NavLink>
        <div></div>
         <NavLink to="/vendor" activeClassName="active" className="nav-item">

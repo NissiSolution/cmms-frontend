@@ -1,275 +1,164 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import './PartsPage.css';
 import SidebarComponent from "../sidebar/SidebarComponent";
-import './PartsPage.css'
+
 const PartsPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal for add/edit
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false); // Modal for view
-  const [parts, setParts] = useState([
-    {
-      id: 1,
-      name: "Brake Pad",
-      thumbnail:
-        require('../img/brake-pads-and-brake-discs.jpg'),
-      partNumber: "BP12345",
-      quantity: 50,
-      price: "$25.00",
-      category: "Vehicle Parts",
-    },
-    {
-      id: 2,
-      name: "Oil Filter",
-      thumbnail:
-        require('../img/61xFNfD+cFL._AC_UF1000,1000_QL80_.jpg'),
-      partNumber: "OF67890",
-      quantity: 30,
-      price: "$15.00",
-      category: "Maintenance",
-    },
-    {
-      id: 3,
-      name: "Air Filter",
-      thumbnail:
-        require('../img/61jeyJugeBL.jpg'),
-      partNumber: "AF54321",
-      quantity: 100,
-      price: "$20.00",
-      category: "Engine Components",
-    },
-  ]);
+  const [assets, setAssets] = useState([]);
+  const [recentStockOuts, setRecentStockOuts] = useState([]); // State for recent stock-outs
+  const [remark, setRemark] = useState("");
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [subtractQuantity, setSubtractQuantity] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const [currentPart, setCurrentPart] = useState({});
-  const [editIndex, setEditIndex] = useState(null);
+  // Fetching assets data
+  useEffect(() => {
+    const fetchAssets = async () => {
+      try {
+        const response = await axios.get('https://cmms-backend-1.onrender.com/api/assets/get');
+        setAssets(response.data);
+      } catch (error) {
+        console.error("Error fetching assets:", error);
+      }
+    };
 
-  const openModal = (part = {}, index = null) => {
-    setCurrentPart(part);
-    setEditIndex(index);
-    setIsModalOpen(true);
-  };
+    fetchAssets();
+  }, []);
 
-  const openViewModal = (part) => {
-    setCurrentPart(part);
-    setIsViewModalOpen(true);
-  };
+  // Fetch recent stock-out data
+  useEffect(() => {
+    const fetchRecentStockOuts = async () => {
+      try {
+        const response = await axios.get('https://cmms-backend-1.onrender.com/api/remark/get');
+        setRecentStockOuts(response.data); // Assuming the response data is an array of stock-out records
+      } catch (error) {
+        console.error("Error fetching recent stock outs:", error);
+      }
+    };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setIsViewModalOpen(false);
-    setCurrentPart({});
-    setEditIndex(null);
-  };
+    fetchRecentStockOuts();
+  }, []);
 
-const handleInputChange = (e) => {
-  const { name, value, files } = e.target;
-
-  // For file input (image upload)
-  if (name === "thumbnail" && files && files[0]) {
-    const file = files[0];
-    const fileURL = URL.createObjectURL(file); // Generate a temporary URL
-    setCurrentPart((prev) => ({
-      ...prev,
-      thumbnail: fileURL,
-    }));
-  } else {
-    // For other inputs
-    setCurrentPart((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-};
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedParts = [...parts];
-
-    if (editIndex !== null) {
-      updatedParts[editIndex] = currentPart;
-    } else {
-      updatedParts.push({
-        ...currentPart,
-        id: Date.now(),
-      });
+  const handleSubtractQuantity = async () => {
+    if (!selectedAsset || subtractQuantity <= 0) {
+      setErrorMessage("Please select a valid asset and enter a positive quantity.");
+      return;
     }
 
-    setParts(updatedParts);
-    closeModal();
-  };
+    if (subtractQuantity > selectedAsset.quantity) {
+      setErrorMessage("Cannot subtract more than the available quantity.");
+      return;
+    }
 
-  const handleDelete = (index) => {
-    const updatedParts = parts.filter((_, i) => i !== index);
-    setParts(updatedParts);
+    try {
+      const updatedQuantity = parseInt(selectedAsset.quantity) - parseInt(subtractQuantity);
+
+      // Update asset quantity
+      await axios.put(
+        `https://cmms-backend-1.onrender.com/api/assets/update/${selectedAsset.id}`,
+        { quantity: updatedQuantity }
+      );
+
+      // Add remark
+      if (remark) {
+        await axios.post("https://cmms-backend-1.onrender.com/api/remark", {
+          asset_id: selectedAsset.id,
+          stock: parseInt(subtractQuantity),
+          remark,
+        });
+      }
+
+      setAssets((prevAssets) =>
+        prevAssets.map((asset) =>
+          asset.id === selectedAsset.id
+            ? { ...asset, quantity: updatedQuantity }
+            : asset
+        )
+      );
+
+      setSuccessMessage(`Stock updated successfully for ${selectedAsset.name}.`);
+      setSelectedAsset(null);
+      setSubtractQuantity(0);
+      setRemark("");
+      setErrorMessage("");
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.error || error.message || "An unknown error occurred"
+      );
+    }
   };
 
   return (
-    <div className="Parts-page">
+    <div className="StockOut-page">
       <SidebarComponent />
-
       <div className="main-content">
         <header className="header">
-          <h1>Parts</h1>
-          <button className="add-btn" onClick={() => openModal()}>
-            + Add Part
-          </button>
+          <h1>Stock Out Management</h1>
         </header>
 
-        {/* Table */}
-        <div className="parts-list">
-          <table>
-            <thead>
-              <tr>
-                <th>Thumbnail</th>
-                <th>Part Number</th>
-                <th>Name</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {parts.map((part, index) => (
-                <tr key={part.id}>
-                  <td>
-                    <img
-                      src={part.thumbnail}
-                      alt={part.name}
-                      style={{ width: "50px", height: "50px", borderRadius: "5px" }}
-                    />
-                  </td>
-                  <td>{part.partNumber}</td>
-                  <td>{part.name}</td>
-                  <td>
-                    <button
-                      className="action-btn view"
-                      onClick={() => openViewModal(part)}
-                    >
-                      👁️ View
-                    </button>
-                    <button
-                      className="action-btn edit"
-                      onClick={() => openModal(part, index)}
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button
-                      className="action-btn delete"
-                      onClick={() => handleDelete(index)}
-                    >
-                      🗑️ Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {successMessage && <p className="success-message">{successMessage}</p>}
+
+        <div className="stock-out-form">
+          <label>
+            <span>Select Asset:</span>
+            <select
+              value={selectedAsset?.id || ""}
+              onChange={(e) => {
+                const asset = assets.find((a) => a.id === parseInt(e.target.value));
+                setSelectedAsset(asset || null);
+              }}
+            >
+              <option value="">-- Select Asset --</option>
+              {assets
+                .filter((asset) => asset.quantity > 0)
+                .map((asset) => (
+                  <option key={asset.id} value={asset.id}>
+                    {asset.name} (In Stock: {asset.quantity})
+                  </ option>
+                ))}
+            </select>
+          </label>
+
+          <label>
+            <span>Quantity:</span>
+            <input
+              type="number"
+              value={subtractQuantity}
+              onChange={(e) => setSubtractQuantity(parseInt(e.target.value))}
+              min="1"
+              placeholder="Enter quantity to subtract"
+            />
+          </label>
+          <label>
+            <span>Remarks:</span>
+            <textarea
+              placeholder="Info about stock out"
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+            ></textarea>
+          </label>
+
+          <button className="subtract-btn" onClick={handleSubtractQuantity}>
+            Update Stock
+          </button>
+        </div>
+
+        <div className="recent-stock-outs">
+          <h2>Recent Stock-Outs</h2>
+          <div className="stock-out-cards">
+            {recentStockOuts.map((stockOut) => (
+              <div className="stock-out-card" key={stockOut.id}>
+                <h3>{stockOut.asset_name}</h3>
+                <p>Quantity: {stockOut.stock}</p>
+                <p>Remark: {stockOut.remark}</p>
+                <p>Date: {new Date(stockOut.created_at).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-
-      {/* Add/Edit Modal */}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>{editIndex !== null ? "Edit Part" : "Add Part"}</h2>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Name:
-                <input
-                  type="text"
-                  name="name"
-                  value={currentPart.name || ""}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <label>
-                Part Thumbnail :
-              
-  <input
-    type="file"
-    name="thumbnail"
-    accept="image/png, image/gif, image/jpg, image/jpeg"
-    onChange={handleInputChange}
-  />
-</label>
-              <label>
-                Part Number:
-                <input
-                  type="text"
-                  name="partNumber"
-                  value={currentPart.partNumber || ""}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-              <label>
-                Quantity:
-                <input
-                  type="number"
-                  name="quantity"
-                  value={currentPart.quantity || ""}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Price:
-                <input
-                  type="text"
-                  name="price"
-                  value={currentPart.price || ""}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Category:
-                <input
-                  type="text"
-                  name="category"
-                  value={currentPart.category || ""}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <div className="modal-actions">
-                <button type="button" onClick={closeModal}>
-                  Close
-                </button>
-                <button type="submit">Save</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* View Modal */}
-      {isViewModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Part Details</h2>
-            <p>
-              <strong>Name:</strong> {currentPart.name}
-            </p>
-            <p>
-              <strong>Part Number:</strong> {currentPart.partNumber}
-            </p>
-            <p>
-              <strong>Quantity:</strong> {currentPart.quantity}
-            </p>
-            <p>
-              <strong>Price:</strong> {currentPart.price}
-            </p>
-            <p>
-              <strong>Category:</strong> {currentPart.category}
-            </p>
-            <p>
-              <strong>Thumbnail:</strong>
-            </p>
-            <img
-              src={currentPart.thumbnail}
-              alt={currentPart.name}
-              style={{ width: "150px", borderRadius: "5px" }}
-            />
-            <div className="modal-actions">
-              <button onClick={closeModal}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

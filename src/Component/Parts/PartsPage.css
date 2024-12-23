@@ -1,124 +1,84 @@
-.Parts-page{
+.StockOut-page{
     display: flex;
 }/* Action Buttons */
-.action-btn {
-    margin: 0 5px;
-    padding: 5px;
-    border: none;
-    cursor: pointer;
-    background: transparent; /* No background color */
-    font-size: 16px;
-  }
-  
-  .action-btn.view {
-    color: #17a2b8; /* Light blue for view */
-  }
-  
-  .action-btn.edit {
-    color: #ffc107; /* Yellow for edit */
-  }
-  
-  .action-btn.delete {
-    color: #dc3545; /* Red for delete */
-  }
-  
-  .parts-list table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  .parts-list th,
-  .parts-list td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .parts-list img {
-    object-fit: cover;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  
-  .modal {
-    background: white;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90%; /* Limit height to 90% of the viewport */
-    overflow-y: auto; /* Enable scrolling if content overflows */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative; /* Ensures child elements like close button align properly */
-  }
-  
-  .modal h2 {
-    margin-top: 0;
-  }
-  
-  .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .modal-actions button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background: #007bff;
-    color: white;
-    transition: background 0.3s ease;
-  }
-  
-  .modal-actions button:hover {
-    background: #0056b3;
-  }
-  
-  button[type="button"] {
-    background: #6c757d;
-  }
-  
-  button[type="button"]:hover {
-    background: #5a6268;
-  }
-  
-  .Parts-page {
-    display: flex;
-  }
-  .parts-list th,.parts-list td{
-    padding: 10px;
-      border: 1px solid #ddd;
-      text-align: left;
-  }
-  th {
-    background-color: #1b2a4e; /* Dark blue background */
-    color: #ffffff; /* White text color */
-  }
-  
-  /* Table Cells */
-  td {
-    color: #1b2a4e; /* Dark blue text color */
-  }
-  .parts-list table{
-    width: 100%;
-      border-collapse: collapse;
-      background: white;
-  }
-  .parts-list th{
-    background-color: #1b2a4e;
-    color: white
-  }
+.stock-out-form {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column; /* Stack the labels and inputs vertically */
+  max-width: 400px; /* Set a max width for the form */
+}
+
+.stock-out-form label {
+  display: flex; /* Use flexbox for the label */
+  align-items: center; /* Center items vertically */
+  margin-bottom: 15px; /* Space between each label/input pair */
+}
+
+.stock-out-form label span {
+  color: whitesmoke;
+  flex: 1; /* Allow the label text to take up space */
+}
+
+.stock-out-form input,
+.stock-out-form select,
+.stock-out-form textarea {
+  flex: 2; /* Allow the input to take the remaining space */
+  margin-left: 10px; /* Space between label and input */
+  padding: 8px; /* Add some padding for better appearance */
+  border: 1px solid #ccc; /* Add a border */
+  border-radius: 4px; /* Rounded corners */
+  width: 100%; /* Make sure they take the full width of the container */
+}
+
+.stock-out-form textarea {
+  resize: vertical; /* Allow vertical resizing */
+  min-height: 60px; /* Set a minimum height for the textarea */
+}
+
+.subtract-btn {
+width: 200px;
+margin: 0 auto;
+  margin-top: 20px; 
+/* Space above the button */
+  padding: 10px 15px; /* Padding for the button */
+  background-color: #007bff; /* Button color */
+  color: white; /* Text color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.subtract-btn:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+.recent-stock-outs {
+  margin-top: 20px;
+}
+
+.stock-out-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stock-out-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  width: calc(50% - 10px); /* Two columns */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.stock-out-card:hover {
+  transform: scale(1.05);
+}
+
+.stock-out-card h3 {
+  margin: 0 0 10px;
+}
+
+.stock-out-card p {
+  margin: 5px 0;
+}

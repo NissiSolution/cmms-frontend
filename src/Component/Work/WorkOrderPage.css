@@ -123,7 +123,6 @@ color: #1b2a4e;
   
   /* Sidebar Styles (inherits SidebarComponent styles) */
   .sidebar {
-    width: 250px;
     background-color: #1b2a4e;
     color: white;
     min-height: 100vh;
