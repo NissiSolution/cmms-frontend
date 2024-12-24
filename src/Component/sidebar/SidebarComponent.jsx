@@ -5,7 +5,7 @@ import logo from '../img/logo.png';
 import './SidebarComponent.css'; // Styles specific to Sidebar
 
 const SidebarComponent = () => {
-
+  const role=localStorage.getItem('role')
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -15,10 +15,13 @@ const SidebarComponent = () => {
         <NavLink to="/dashboard" activeClassName="active" className="nav-item">
           Dashboard
         </NavLink>
-
-        <NavLink to="/employee" activeClassName="active" className="nav-item">
-          Employee
-        </NavLink>
+      {role!=='user'&&(
+ <NavLink to="/employee" activeClassName="active" className="nav-item">
+ Employee
+</NavLink>
+      )
+      }
+       
 
         <NavLink to="/location" activeClassName="active" className="nav-item">
           Location
@@ -32,10 +35,14 @@ const SidebarComponent = () => {
         <NavLink to="/stock" activeClassName="active" className="nav-item">
           Stock
         </NavLink>
-        <NavLink to="/add-stock" activeClassName="active" className="nav-item">Add Stock</NavLink>
-        <NavLink to="/stock-out" activeClassName="active" className="nav-item">
-          Out-Stock
-        </NavLink>
+        {role!=='user'&&(<>
+ <NavLink to="/add-stock" activeClassName="active" className="nav-item">Add Stock</NavLink>
+ <NavLink to="/stock-out" activeClassName="active" className="nav-item">
+   Out-Stock
+ </NavLink>
+ </>
+        )}
+       
        <div></div>
         <NavLink to="/vendor" activeClassName="active" className="nav-item">
           Vendor

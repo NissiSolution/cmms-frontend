@@ -10,7 +10,7 @@ const Vendor = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [currentVendor, setCurrentVendor] = useState({});
   const [editIndex, setEditIndex] = useState(null);
-
+  const role=localStorage.getItem('role')
   // Fetch vendors on component mount
   useEffect(() => {
     fetchVendors();
@@ -81,16 +81,21 @@ const Vendor = () => {
       <div className="main-content">
         <header className="header">
           <h1>Vendors</h1>
+          {role!=='user'&&(<>
+
           <button className="add-btn" onClick={() => openModal()}>
             + Add Vendor
           </button>
+          </>)}
         </header>
 
         <div className="vendor-list">
           <table>
             <thead>
               <tr>
-                <th>Name</th>
+                <th>Vendor ID</th>
+                <th>CompanyName</th>
+                <th>ContactPerson Name</th>
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Actions</th>
@@ -99,17 +104,21 @@ const Vendor = () => {
             <tbody>
               {vendors.map((vendor, index) => (
                 <tr key={vendor.id}>
+                  <td>{vendor.vendor_id}</td>
                   <td>{vendor.name}</td>
+                  <td>{vendor.contactperson}</td>
                   <td>{vendor.email}</td>
                   <td>{vendor.phone}</td>
                   <td>
                     <button className="action-btn view" onClick={() => openViewModal(vendor)}>
                       <FaEye />
                     </button>
+                    {role!=='user'&&(<>
 
                     <button className="action-btn delete" onClick={() => handleDelete(vendor.id)}>
                       <FaTrashAlt />
                     </button>
+                    </>)}
                   </td>
                 </tr>
               ))}
@@ -124,12 +133,32 @@ const Vendor = () => {
           <div className="modal">
             <h2>{editIndex !== null ? "Edit Vendor" : "Add Vendor"}</h2>
             <form onSubmit={handleSubmit}>
+            <label>
+                vendorID
+                <input
+                  type="text"
+                  name="vendor_id"
+                  value={currentVendor.vendor_id || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
               <label>
                 Name:
                 <input
                   type="text"
                   name="name"
                   value={currentVendor.name || ""}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                Contact Person Name:
+                <input
+                  type="text"
+                  name="contactperson"
+                  value={currentVendor.contactperson|| ""}
                   onChange={handleInputChange}
                   required
                 />
@@ -153,6 +182,13 @@ const Vendor = () => {
                   onChange={handleInputChange}
                   required
                 />
+              </label>
+              <label>
+                Address
+                <textarea name="address" id="" cols="10" rows="10" 
+                  value={currentVendor.address || ""}
+                  onChange={handleInputChange}
+                  required></textarea>
               </label>
               <div className="modal-actions">
                 <button type="button" onClick={closeModal}>

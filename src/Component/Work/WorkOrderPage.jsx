@@ -19,6 +19,7 @@ const WorkOrderPage = () => {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
+  const role=localStorage.getItem('role')
   useEffect(() => {
     fetchWorkOrders();
     fetchEmployees();
@@ -86,9 +87,11 @@ const WorkOrderPage = () => {
       <div className="work-order-content">
         <header className="header">
           <h1>Work Orders</h1>
+          {role!=='user'&&(
           <button className="add-btn" onClick={() => openModal()}>
             + Add Work Order
           </button>
+          )}
         </header>
 
         <div className="filter">
@@ -143,9 +146,12 @@ const WorkOrderPage = () => {
       <button className="action-btn view" onClick={() => openModal(order, index, true)}>
         <FaEye />
       </button>
-      <button className="action-btn edit" onClick={() => openModal(order, index)}>
-        <FaEdit />
-      </button>
+    {role!=='user'&&(
+ <button className="action-btn edit" onClick={() => openModal(order, index)}>
+ <FaEdit />
+</button>
+    )}
+     
     </td>
   </tr>
 ))}
@@ -163,8 +169,8 @@ const WorkOrderPage = () => {
                   <p><strong>Instructions:</strong> {currentOrder.instructions}</p>
                   <p><strong>Status:</strong> {currentOrder.status}</p>
                   <p><strong>Assigned:</strong> {currentOrder.assigned}</p>
-                  <p><strong>Start Date:</strong> {currentOrder.start_date}</p>
-                  <p><strong>Deadline:</strong> {currentOrder.deadline}</p>
+                  <p><strong>Start Date:</strong> {formatDate(currentOrder.start_date)}</p>
+                  <p><strong>Deadline:</strong> {formatDate(currentOrder.deadline)}</p>
                   <div className="modal-actions">
                     <button onClick={closeModal}>Close</button>
                   </div>

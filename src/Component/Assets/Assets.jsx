@@ -38,6 +38,7 @@ const Assets = () => {
     setIsViewModalOpen(false);
     setCurrentAsset({});
   };
+   const role=localStorage.getItem('role')
 
   const handleDelete = async (index) => {
     const assetToDelete = assets[index];
@@ -75,9 +76,10 @@ const Assets = () => {
       <div className="main-content">
         <header className="header">
           <h1>Inventory Management</h1>
+          {role!=='user'&&(
           <button className="add-btn" onClick={() => navigate("/add-stock")}>
             + Add Asset
-          </button>
+          </button>)}
         </header>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -134,18 +136,20 @@ const Assets = () => {
                     >
                       <FaEye />
                     </button>
+                    {role!=='user'&&(
+                      <>
                     <button
                       className="action-btn edit"
                       onClick={() => navigate("/add-stock", { state: { asset } })} // Navigate to Add page with asset data
                     >
                       <FaEdit />
-                    </button>
+                    </button> 
                     <button
                       className="action-btn delete"
                       onClick={() => handleDelete(index)}
                     >
                       <FaTrashAlt />
-                    </button>
+                    </button></>)}
                   </td>
                 </tr>
               ))}

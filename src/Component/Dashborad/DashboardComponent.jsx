@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import './DashboardComponent.css';
 import {  useDispatch } from "react-redux";
-import { clearUsers } from '../../store/slice';
+import { clearUsers,setAuth,setRole } from '../../store/slice';
 import { Line, Doughnut } from 'react-chartjs-2';
+import axios from 'axios';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,9 +35,33 @@ ChartJS.register(
 
 const DashboardComponent = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const role = localStorage.getItem('role')
+    const role = localStorage.getItem('role') || null; 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [employees,setEmp]=useState()
+  const [attendance,setAttendance]=useState()
+  const today = new Date();
+
+const year = today.getFullYear();
+const month = String(today.getMonth() + 1).padStart(2, '0');
+const day = String(today.getDate()).padStart(2, '0'); 
+
+const formattedDate = `${day}-${month}-${year}`;
+console.log(`Formatted date: ${formattedDate}`); 
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+ const attendanceToday=attendance?.filter(att=>(
+  formatDate(att.date)===formattedDate
+ ))
+
+console.log(attendanceToday);
+
   const lineChartData = {
     labels: ['April', 'May', 'June', 'July', 'August', 'September'],
     datasets: [
@@ -62,11 +87,40 @@ const DashboardComponent = () => {
       },
     ],
   };
-
+  const getAttendance= async()=>{
+    try {
+      const response= await axios.get('https://cmms-backend-1.onrender.com/api/emp/atd/get', {
+        withCredentials: true,
+      });
+      setAttendance(response.data);
+    } catch (err) {
+      console.error('Error fetching recent work orders:', err);
+    }
+  }  
+  
+  useEffect(()=>{
+    const fetchEmp=async()=>{
+      try {
+        const employeeResponse = await axios.get('https://cmms-backend-1.onrender.com/api/emp/get', {
+          withCredentials: true,
+        });
+        setEmp(employeeResponse.data);
+  
+        await getAttendance()
+      } catch (err) {
+        console.error('Error fetching employees:', err);
+      }
+    }
+    fetchEmp()
+  },[])
  // Ensure it updates when userValue changes
 
   const handleLogout = () => {
-    dispatch(clearUsers()); // Persist clearUsers function
+    localStorage.removeItem('auth'); // Clear auth state
+    localStorage.removeItem('role'); // Clear role state
+    dispatch(clearUsers());
+    dispatch(setAuth(false)); // Set auth to false on logout
+    dispatch(setRole(null));
     navigate('/');
   };
 
@@ -102,16 +156,17 @@ const DashboardComponent = () => {
           </div>
         </header>
 
-        {role === 'superAdmin' ? (
+        {role === 'admin' ? (
           <>
             <section className="dashboard-stats">
+            
               <div className="stat-card">
-                <h3>Total Users</h3>
-                <p>3 Users</p>
+                <h3>Total Employee</h3>
+                <p>{employees?.length||20}</p>
               </div>
               <div className="stat-card">
-                <h3>Most Purchased Plan</h3>
-                <p>Gold</p>
+                <h3>Total Employee Present Today</h3>
+                <p>{attendanceToday?.length||20}</p>
               </div>
             </section>
             <section className="chart-section">
@@ -119,7 +174,33 @@ const DashboardComponent = () => {
               <Line data={lineChartData} />
             </section>
           </>
-        ) : (
+        ) : role==='user'?(<>
+        <section className="dashboard-stats">
+              <div className="stat-card blue">
+               <h3>Total Assign Work Order</h3>
+               <p>5</p>
+              </div>
+              <div className="stat-card blue">
+                <h3>Total Open Work Order</h3>
+                <p>3</p>
+              </div>
+              <div className="stat-card blue">
+                <h3>Total Complete Work Order</h3>
+                <p>2</p>
+              </div>
+            </section>
+
+            {/* Charts Section */}
+            <section>
+              <h3>
+                User Details
+              </h3>
+               <p>Name:</p>
+            
+            </section>
+        
+        
+        </>): (
           <>
             {/* Dashboard Stats */}
             <section className="dashboard-stats">

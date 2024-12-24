@@ -4,19 +4,26 @@ export const  Slice=createSlice({
     name:"user",
     initialState:{
        users:null,
-       all:null
+       role:localStorage.getItem('role') || null,
+       auth: localStorage.getItem('auth') || false,
     },reducers:{
+        setAuth:(state,action)=>{
+            state.auth = action.payload;
+        },
         setUsers:(state,action)=>{
             state.users=action.payload;
         }  , clearUsers: (state) => {
             state.users = null; // Clear the user state
         },
-        setAllUsers:(state,action)=>{
-            state.all=action.payload
+        removeAuth: (state) => {
+            state.auth = false;
+          },
+        setRole:(state,action)=>{
+            state.role=action.payload
         }
 
     }
 })
 
-export const {setUsers,clearUsers,setAllUsers}=Slice.actions;
+export const {setUsers,clearUsers,setRole,setAuth,removeAuth}=Slice.actions;
 export default Slice.reducer;

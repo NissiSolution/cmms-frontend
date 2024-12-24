@@ -54,7 +54,9 @@ margin: 0 auto;
 .recent-stock-outs {
   margin-top: 20px;
 }
-
+.recent-stock-outs h2{
+  color: whitesmoke;
+}
 .stock-out-cards {
   display: flex;
   flex-wrap: wrap;
@@ -77,8 +79,17 @@ margin: 0 auto;
 
 .stock-out-card h3 {
   margin: 0 0 10px;
+  color: black;
 }
 
 .stock-out-card p {
   margin: 5px 0;
+}
+.dlt-btn{
+  border: none;
+  padding: 5px;
+  background: tomato;
+  color: whitesmoke;
+  border-radius: 10px;
+  cursor: pointer;
 }

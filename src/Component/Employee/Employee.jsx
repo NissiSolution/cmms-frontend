@@ -17,6 +17,14 @@ const [selectedDate, setSelectedDate] = useState('');
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [attendance,setAttendance]=useState()
   const [isAttendancePopupOpen, setIsAttendancePopupOpen] = useState(false);
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+};
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -34,7 +42,7 @@ const [selectedDate, setSelectedDate] = useState('');
 
     fetchEmployees();
   }, [employees]);
-
+ 
   const fetchRecentWorkOrders = async () => {
     try {
       const workResponse = await axios.get('https://cmms-backend-1.onrender.com/api/work/get', {
@@ -165,8 +173,9 @@ const [selectedDate, setSelectedDate] = useState('');
           <table>
             <thead>
               <tr>
-                <th>Emp ID</th>
+                <th>Sno</th>
                 <th>Name</th>
+                <th>EmployeeID</th>
                 <th>Department</th>
                 <th>Today Attendance</th>
                 <th>Skillset</th>
@@ -175,37 +184,49 @@ const [selectedDate, setSelectedDate] = useState('');
               </tr>
             </thead>
             <tbody>
-              {employees?.map((employee, index) => {
-                const assignedWorkOrder = workOrders.find(work => work.assigned === employee.name);
-                const recentWorkOrder = assignedWorkOrder ? assignedWorkOrder.name : 'N/A';
-                let att=attendance?.filter(att=>att.employee_id===employee.id).reverse((a,b)=>b-a)
-                let sta=att ?att[0]?.status:'absent'
-                                
-                return (
-                  <tr key={employee.id}>
-                    <td>{employee.id}</td>
-                    <td>{employee.name}</td>
-                    <td>{employee.department}</td>
-                    <td>{sta}</td>
-                    <td>{employee.skillset}</td>
-                    <td>{recentWorkOrder}</td>
-                    <td>
-                      <button
-                        className="edit-btn"
-                        onClick={() => openModal(employee, index)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="attendance-btn"
-                        onClick={() => openAttendanceModal(employee.id)}
-                      >
-                        Mark Attendance
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+            {employees?.map((employee, index) => {
+  const assignedWorkOrder = workOrders.find(work => work.assigned === employee.name);
+  const recentWorkOrder = assignedWorkOrder ? assignedWorkOrder.name : 'N/A';
+
+  // Get today's date in the same format as your attendance records
+  const todayDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+  // Filter attendance records for the current employee
+  const att = attendance?.filter(att => att.employee_id === employee.id);
+   
+  // Find today's attendance record
+  const todayAttendance = att?.find(record => formatDate (record.date) === todayDate);
+
+  // Determine the status based on today's attendance record
+  const sta = todayAttendance ? todayAttendance.status : 'absent';
+
+  return (
+    <tr key={employee.id}>
+      <td>{employee.id}</td>
+      <td>{employee.name}</td>
+      <td>{employee.emp_id}</td>
+
+      <td>{employee.department}</td>
+      <td>{sta}</td>
+      <td>{employee.skillset}</td>
+      <td>{recentWorkOrder}</td>
+      <td>
+        <button
+          className="edit-btn"
+          onClick={() => openModal(employee, index)}
+        >
+          Edit
+        </button>
+        <button
+          className="attendance-btn"
+          onClick={() => openAttendanceModal(employee.id)}
+        >
+          Mark Attendance
+        </button>
+      </td>
+    </tr>
+  );
+})}
             </tbody>
           </table>
         </div>
@@ -222,6 +243,16 @@ const [selectedDate, setSelectedDate] = useState('');
                   type="text"
                   name="name"
                   value={currentEmployee.name || ''}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                EmployeeID
+                <input
+                  type="text"
+                  name="emp_id"
+                  value={currentEmployee.emp_id || ''}
                   onChange={handleInputChange}
                   required
                 />

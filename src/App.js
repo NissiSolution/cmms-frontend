@@ -1,13 +1,12 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useSelector } from "react-redux";
 import DashboardComponent from './Component/Dashborad/DashboardComponent';
 import Login from './Component/Login/Login';
 import Profile from './Component/Profile/Profile';
 import Employee from './Component/Employee/Employee';
 import Register from './Component/Login/Register';
-import UsersPage from './Component/UserPage/UserPage';
-import RolesPage from './Component/Rolepage/RolePage';
 import LocationPage from './Component/Location/LocationPage';
 import WorkOrderPage from './Component/Work/WorkOrderPage';
 import Assets from './Component/Assets/Assets';
@@ -17,28 +16,47 @@ import AboutUs from './Component/About/AboutUs';
 import PrivacyPolicy from './Component/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Component/TermsAndConditions/TermsAndConditions';
 import Add from './Component/AddStock/Add';
+
 function App() {
+  const auth = useSelector((state) => state.user?.auth);
+  const role = useSelector((state) => state.user?.role);
+
+  const ProtectedRoute = ({ allowedRoles }) => {
+    if (!auth) {
+      return <Navigate to="/" />;
+    }
+    if (allowedRoles && !allowedRoles.includes(role)) {
+      return <Navigate to="/" />; // Redirect to home or an unauthorized page
+    }
+    return <Outlet />;
+  };
+
   return (
     <Router>
       <Routes>
         {/* Define routes */}
         <Route path="/" index element={<Login />} />
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path='/employee' element={<Employee/>}/>
-        <Route path='/privacy' element={<PrivacyPolicy/>}/>
-        <Route path='/terms' element={<TermsAndConditions/>}/>
-        <Route path="/dashboard/*" element={<DashboardComponent />} />
-        <Route path='/about' element={<AboutUs/>}/>
+        <Route path='/terms' element={<TermsAndConditions />} />
+        <Route path='/about' element={<AboutUs />} />
         <Route path="/register" element={<Register />} />
-        <Route path='/staff/users' element={<UsersPage/>}/>
-        <Route path='/profile' element={<Profile/> }/>
-        <Route path='/staff/roles' element={<RolesPage/>}/>
-        <Route path='/location' element={<LocationPage/>}></Route>
-        <Route path='/work-order' element={<WorkOrderPage/>}/>
-      <Route path='/stock' element={<Assets/>}/>
-      <Route path='/add-stock' element={<Add/>}/>
-      <Route path='/stock-out' element={<PartsPage/>}/>
-      <Route path='/vendor' element={<Vendor/>}/>
+        <Route path='/privacy' element={<PrivacyPolicy />} />
+
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'user', 'companyAdmin']} />}>
+          <Route path="/dashboard/*" element={<DashboardComponent />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/location' element={<LocationPage />} />
+          <Route path='/work-order' element={<WorkOrderPage />} />
+          <Route path='/stock' element={<Assets />} />
+          <Route path='/vendor' element={<Vendor />} />
+        </Route>
+
+        {/* Restrict access to specific roles */}
+        <Route element={<ProtectedRoute allowedRoles={['admin','companyAdmin']} />}>
+          <Route path='/employee' element={<Employee />} />
+          <Route path='/add-stock' element={<Add />} />
+          <Route path='/stock-out' element={<PartsPage />} />
+        </Route>
       </Routes>
     </Router>
   );

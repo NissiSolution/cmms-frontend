@@ -5,12 +5,20 @@ import SidebarComponent from "../sidebar/SidebarComponent";
 
 const PartsPage = () => {
   const [assets, setAssets] = useState([]);
-  const [recentStockOuts, setRecentStockOuts] = useState([]); // State for recent stock-outs
+  const [recentStockOuts, setRecentStockOuts] = useState([]);
   const [remark, setRemark] = useState("");
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [subtractQuantity, setSubtractQuantity] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
   // Fetching assets data
   useEffect(() => {
@@ -31,7 +39,7 @@ const PartsPage = () => {
     const fetchRecentStockOuts = async () => {
       try {
         const response = await axios.get('https://cmms-backend-1.onrender.com/api/remark/get');
-        setRecentStockOuts(response.data); // Assuming the response data is an array of stock-out records
+        setRecentStockOuts(response.data);
       } catch (error) {
         console.error("Error fetching recent stock outs:", error);
       }
@@ -64,7 +72,7 @@ const PartsPage = () => {
       if (remark) {
         await axios.post("https://cmms-backend-1.onrender.com/api/remark", {
           asset_id: selectedAsset.id,
-          asset_name:selectedAsset.name,
+          asset_name: selectedAsset.name,
           stock: parseInt(subtractQuantity),
           remark,
         });
@@ -83,6 +91,40 @@ const PartsPage = () => {
       setSubtractQuantity(0);
       setRemark("");
       setErrorMessage("");
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.error || error.message || "An unknown error occurred"
+      );
+    }
+  };
+
+  const handleDeleteStockOut = async (stockOut) => {
+    const confirmed = window.confirm("Are you sure you want to delete this stock-out record?");
+    if (!confirmed) return;
+  
+    try {
+      // Fetch the current asset to get its current quantity
+      const assetResponse = await axios.get(`https://cmms-backend-1.onrender.com/api/assets/get/${stockOut.asset_id}`);
+      const currentAsset = assetResponse.data;
+  
+      // Calculate the updated quantity
+      const updatedQuantity = parseInt(currentAsset.quantity) + parseInt(stockOut.stock);
+  
+      // Update the asset quantity
+      await axios.put(
+        `https://cmms-backend-1.onrender.com/api/assets/update/${stockOut.asset_id}`,
+        { quantity: updatedQuantity }
+      );
+  
+      // Delete the stock-out record
+      await axios.delete(`https://cmms-backend-1.onrender.com/api/remark/${stockOut.id}`);
+  
+      // Update the state to remove the deleted stock-out
+      setRecentStockOuts((prevStockOuts) =>
+        prevStockOuts.filter((item) => item.id !== stockOut.id)
+      );
+  
+      setSuccessMessage(`Stock-out record for ${stockOut.asset_name} deleted successfully.`);
     } catch (error) {
       setErrorMessage(
         error.response?.data?.error || error.message || "An unknown error occurred"
@@ -117,7 +159,7 @@ const PartsPage = () => {
                 .map((asset) => (
                   <option key={asset.id} value={asset.id}>
                     {asset.name} (In Stock: {asset.quantity})
-                  </ option>
+                  </option>
                 ))}
             </select>
           </label>
@@ -149,12 +191,13 @@ const PartsPage = () => {
         <div className="recent-stock-outs">
           <h2>Recent Stock-Outs</h2>
           <div className="stock-out-cards">
-            {recentStockOuts.map((stockOut) => (
+            {recentStockOuts.reverse((a,b)=>b-a).map((stockOut) => (
               <div className="stock-out-card" key={stockOut.id}>
                 <h3>{stockOut.asset_name}</h3>
                 <p>Quantity: {stockOut.stock}</p>
                 <p>Remark: {stockOut.remark}</p>
-                <p>Date: {new Date(stockOut.created_at).toLocaleDateString()}</p>
+                <p>Date: {formatDate(stockOut.created_at)}</p>
+                <button className="dlt-btn" onClick={() => handleDeleteStockOut(stockOut)}>Delete</button>
               </div>
             ))}
           </div>

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import axios from 'axios';
 import { useDispatch } from "react-redux";
-import { setUsers } from '../../store/slice';
+import { setUsers,setAuth,setRole } from '../../store/slice';
 import logoImage from './logo.png';
 const Login = () => {
   const navigate = useNavigate();
@@ -25,8 +25,11 @@ const Login = () => {
       const user = data?.find((user) => user.email === email && user.password === password);
       if (user) {
         localStorage.setItem('role', user.role);
+        localStorage.setItem('auth',true)
+        dispatch(setRole(user?.role))
         dispatch(setUsers(user))
-       
+        dispatch(setAuth(true))
+
         navigate('/dashboard');
       } else {
         setError('Invalid email or password');
