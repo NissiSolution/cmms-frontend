@@ -191,23 +191,7 @@ const Add = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="vendorId">Vendor:</label>
-            <select
-              id="vendorId"
-              name="vendorId"
-              value={asset.vendorId}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select Vendor</option>
-              {vendors.map((vendor) => (
-                <option key={vendor.id} value={vendor.name}>
-                  {vendor.name}
-                </option>
-              ))}
-            </select>
-          </div>
+         
 
           <div className="form-group">
             <label htmlFor="quantity">Quantity:</label>
@@ -220,7 +204,23 @@ const Add = () => {
               required
             />
           </div>
-
+          <div className="form-group">
+            <label htmlFor="vendor">Vendor:</label>
+            <select
+              id="vendor"
+              name="vendor"
+              value={asset.vendor}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select Vendor</option>
+              {vendors.map((vendor) => (
+                <option key={vendor.id} value={vendor.name}>
+                  {vendor.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="form-group">
             <label htmlFor="thumbnail">Thumbnail:</label>
             <input

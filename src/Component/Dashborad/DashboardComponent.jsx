@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import './DashboardComponent.css';
-import {  useDispatch } from "react-redux";
+import {  useDispatch, useSelector } from "react-redux";
 import { clearUsers,setAuth,setRole } from '../../store/slice';
 import { Line, Doughnut } from 'react-chartjs-2';
+
 import axios from 'axios';
 import {
   Chart as ChartJS,
@@ -38,10 +39,13 @@ const DashboardComponent = () => {
     const role = localStorage.getItem('role') || null; 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
   const [employees,setEmp]=useState()
+  const [assets,setAssets]=useState()
+  const [workOrders,setWorkOrders]=useState()
   const [attendance,setAttendance]=useState()
   const today = new Date();
-
+  const userValue = useSelector((state) => state.user?.users)
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, '0');
 const day = String(today.getDate()).padStart(2, '0'); 
@@ -60,7 +64,6 @@ const formatDate = (dateString) => {
   formatDate(att.date)===formattedDate
  ))
 
-console.log(attendanceToday);
 
   const lineChartData = {
     labels: ['April', 'May', 'June', 'July', 'August', 'September'],
@@ -112,6 +115,28 @@ console.log(attendanceToday);
       }
     }
     fetchEmp()
+    const fetchAssets = async () => {
+      try {
+        const response = await axios.get(
+          "https://cmms-backend-1.onrender.com/api/assets/get"
+        );
+        setAssets(response.data);
+      } catch (error) {
+        console.error("Error fetching assets:", error);
+      }
+    };
+
+    fetchAssets();
+    const fetchWorkOrders = async () => {
+      try {
+        const response = await axios.get('https://cmms-backend-1.onrender.com/api/work/get');
+        setWorkOrders(response.data);
+      } catch (error) {
+        console.error('Error fetching work orders:', error);
+      }
+    };    fetchWorkOrders();
+    
+
   },[])
  // Ensure it updates when userValue changes
 
@@ -123,7 +148,12 @@ console.log(attendanceToday);
     dispatch(setRole(null));
     navigate('/');
   };
-
+ const Pending=workOrders?.filter(work=>work.status==='Open')
+ const Complete=workOrders?.filter(work=>work.status==='Complete')
+ const getEmail=employees?.find(user=>user.email === userValue?.email)?.name 
+ const getUserDetails=workOrders?.filter(user=>user.assigned === getEmail)
+ 
+ 
   return (
     <div className="dashboard-page">
       <SidebarComponent />
@@ -140,7 +170,7 @@ console.log(attendanceToday);
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 style={{ cursor: 'pointer' }}
               >
-                {role || `company`} ▽
+                {userValue?.name || `user`} ▽
               </div>
               {isProfileOpen && (
                 <ul className="dropdown-menu">
@@ -178,43 +208,32 @@ console.log(attendanceToday);
         <section className="dashboard-stats">
               <div className="stat-card blue">
                <h3>Total Assign Work Order</h3>
-               <p>5</p>
+               <p>{getUserDetails?.length}</p>
               </div>
               <div className="stat-card blue">
                 <h3>Total Open Work Order</h3>
-                <p>3</p>
+                <p>{getUserDetails?.filter(user=>user.status === 'Open').length||2}</p>
               </div>
               <div className="stat-card blue">
                 <h3>Total Complete Work Order</h3>
-                <p>2</p>
+                <p>{getUserDetails?.filter(user=>user.status ==='Complete').length||2}</p>
               </div>
             </section>
-
-            {/* Charts Section */}
-            <section>
-              <h3>
-                User Details
-              </h3>
-               <p>Name:</p>
-            
-            </section>
-        
-        
         </>): (
           <>
             {/* Dashboard Stats */}
             <section className="dashboard-stats">
               <div className="stat-card blue">
                 <h3>Total Open Work Order</h3>
-                <p>3</p>
+                <p>{Pending?.length||2}</p>
               </div>
               <div className="stat-card blue">
                 <h3>Total Complete Work Order</h3>
-                <p>2</p>
+                <p>{Complete?.length||3}</p>
               </div>
               <div className="stat-card blue">
                 <h3>Total Assets</h3>
-                <p>5</p>
+                <p>{assets?.length||5}</p>
               </div>
             </section>
 

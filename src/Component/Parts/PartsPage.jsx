@@ -191,15 +191,15 @@ const PartsPage = () => {
         <div className="recent-stock-outs">
           <h2>Recent Stock-Outs</h2>
           <div className="stock-out-cards">
-            {recentStockOuts.reverse((a,b)=>b-a).map((stockOut) => (
-              <div className="stock-out-card" key={stockOut.id}>
-                <h3>{stockOut.asset_name}</h3>
-                <p>Quantity: {stockOut.stock}</p>
-                <p>Remark: {stockOut.remark}</p>
-                <p>Date: {formatDate(stockOut.created_at)}</p>
-                <button className="dlt-btn" onClick={() => handleDeleteStockOut(stockOut)}>Delete</button>
-              </div>
-            ))}
+          {recentStockOuts?.slice().reverse().map((stockOut) => (
+  <div className="stock-out-card" key={stockOut.id}>
+    <h3>{stockOut.asset_name}</h3>
+    <p>Quantity: {stockOut.stock}</p>
+    <p>Remark: {stockOut.remark}</p>
+    <p>Date: {formatDate(stockOut.created_at)}</p>
+    <button className="dlt-btn" onClick={() => handleDeleteStockOut(stockOut)}>Delete</button>
+  </div>
+))}
           </div>
         </div>
       </div>

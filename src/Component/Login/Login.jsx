@@ -21,27 +21,27 @@ const Login = () => {
 
     setLoading(true); // Show loading spinner
     try {
+        const user = data?.find((user) => user.email === email && user.password === password);
+        if (user) {
+            localStorage.setItem('role', user.role);
+            localStorage.setItem('auth', true);
+            localStorage.setItem('users', user); // Persist user data
 
-      const user = data?.find((user) => user.email === email && user.password === password);
-      if (user) {
-        localStorage.setItem('role', user.role);
-        localStorage.setItem('auth',true)
-        dispatch(setRole(user?.role))
-        dispatch(setUsers(user))
-        dispatch(setAuth(true))
+            dispatch(setRole(user?.role));
+            dispatch(setUsers(user));
+            dispatch(setAuth(true));
 
-        navigate('/dashboard');
-      } else {
-        setError('Invalid email or password');
-      }
+            navigate('/dashboard');
+        } else {
+            setError('Invalid email or password');
+        }
     } catch (err) {
-      console.error("Error during login:", err);
-      setError("An error occurred while logging in.");
+        console.error("Error during login:", err);
+        setError("An error occurred while logging in.");
     } finally {
-      setLoading(false); // Hide loading spinner
+        setLoading(false); // Hide loading spinner
     }
-  };
-
+};
   const getDate = async () => {
     try {
       const response = await axios.get("https://cmms-backend-1.onrender.com/api/get", {

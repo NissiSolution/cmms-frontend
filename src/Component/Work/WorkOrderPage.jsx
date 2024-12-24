@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SidebarComponent from '../sidebar/SidebarComponent';
 import './WorkOrderPage.css';
+import { useSelector } from 'react-redux';
 import { FaEye, FaEdit } from 'react-icons/fa';
 import axios from 'axios';
 
@@ -12,14 +13,10 @@ const WorkOrderPage = () => {
   const [editIndex, setEditIndex] = useState(null);
   const [filter, setFilter] = useState('All');
   const [employees, setEmployees] = useState([]);
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-  const role=localStorage.getItem('role')
+  
+  const userValue = useSelector((state) => state.user?.users);
+  const role = localStorage.getItem('role');
+
   useEffect(() => {
     fetchWorkOrders();
     fetchEmployees();
@@ -73,13 +70,31 @@ const WorkOrderPage = () => {
   };
 
   const filterOrders = () => {
-    if (filter === 'Pending') return workOrders.filter(order => order.status === 'Open');
-    if (filter === 'Complete') return workOrders.filter(order => order.status === 'Complete');
-    return workOrders;
+    let filtered = workOrders;
+
+    if (filter === 'Pending') {
+      filtered = filtered.filter(order => order.status === 'Open');
+    } else if (filter === 'Complete') {
+      filtered = filtered.filter(order => order.status === 'Complete');
+    }
+
+    // If the user is a normal or staff user, filter by assigned work orders
+    if (role === 'user' || role === 'normal' || role === 'staff') {
+      const assignedToUser  = userValue?.name; // Assuming userValue contains the user's name
+      filtered = filtered.filter(order => order.assigned === assignedToUser );
+    }
+
+    return filtered;
   };
 
   const filteredOrders = filterOrders();
-
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
   return (
     <div className="work-order-container">
       <SidebarComponent />
@@ -87,9 +102,9 @@ const WorkOrderPage = () => {
       <div className="work-order-content">
         <header className="header">
           <h1>Work Orders</h1>
-          {role!=='user'&&(
-          <button className="add-btn" onClick={() => openModal()}>
-            + Add Work Order
+          {role !== 'user' && (
+            <button className="add-btn" onClick={() => openModal()}>
+ + Add Work Order
           </button>
           )}
         </header>
@@ -118,7 +133,7 @@ const WorkOrderPage = () => {
         <table className="work-order-table">
           <thead>
             <tr>
-              <th>ORDER ID</th>
+              <th>Sno</th>
               <th>ORDER NAME</th>
               <th>PRIORITY</th>
               <th>INSTRUCTIONS</th>
@@ -129,32 +144,31 @@ const WorkOrderPage = () => {
             </tr>
           </thead>
           <tbody>
-          {filteredOrders.map((order, index) => (
-  <tr key={order.id}>
-    <td>{index + 1}</td>
-    <td>{order.name}</td>
-    <td>
-      <span className={`priority ${order.priority}`}>
-        {order.priority} Priority
-      </span>
-    </td>
-    <td>{order.instructions}</td>
-    <td>{order.status}</td>
-    <td>{formatDate(order.start_date)}</td>
-    <td>{formatDate(order.deadline)}</td>
-    <td>
-      <button className="action-btn view" onClick={() => openModal(order, index, true)}>
-        <FaEye />
-      </button>
-    {role!=='user'&&(
- <button className="action-btn edit" onClick={() => openModal(order, index)}>
- <FaEdit />
-</button>
-    )}
-     
-    </td>
-  </tr>
-))}
+            {filteredOrders.map((order, index) => (
+              <tr key={order.id}>
+                <td>{index + 1}</td>
+                <td>{order.name}</td>
+                <td>
+                  <span className={`priority ${order.priority}`}>
+                    {order.priority} Priority
+                  </span>
+                </td>
+                <td>{order.instructions}</td>
+                <td>{order.status}</td>
+                <td>{formatDate(order.start_date)}</td>
+                <td>{formatDate(order.deadline)}</td>
+                <td>
+                  <button className="action-btn view" onClick={() => openModal(order, index, true)}>
+                    <FaEye />
+                  </button>
+                  {role !== 'user' && (
+                    <button className="action-btn edit" onClick={() => openModal(order, index)}>
+                      <FaEdit />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
@@ -164,6 +178,7 @@ const WorkOrderPage = () => {
               {isViewMode ? (
                 <>
                   <h2>Work Order Details</h2>
+                  <p><strong>OrderID: </strong>{currentOrder?.id}</p>
                   <p><strong>Name:</strong> {currentOrder.name}</p>
                   <p><strong>Priority:</strong> {currentOrder.priority}</p>
                   <p><strong>Instructions:</strong> {currentOrder.instructions}</p>
@@ -180,7 +195,7 @@ const WorkOrderPage = () => {
                   <h2>{editIndex !== null ? 'Edit Work Order' : 'Add Work Order'}</h2>
                   <form onSubmit={handleSubmit}>
                     <label>
-                      Name:
+                      Work-Order Name:
                       <input
                         type="text"
                         value={currentOrder.name || ''}
@@ -220,16 +235,17 @@ const WorkOrderPage = () => {
                         {employees.map(emp => (
                           <option key={emp.id} value={emp.name}>
                             {emp.name}
-                          </option>
+ </option>
                         ))}
                       </select>
                     </label>
                     <label>
                       Status:
                       <select
-                        value={currentOrder.status || 'Open'}
+                        value={currentOrder.status || ''}
                         onChange={(e) => setCurrentOrder({ ...currentOrder, status: e.target.value })}
                       >
+                        <option value=" ">Select the status</option>
                         <option value="Open">Pending</option>
                         <option value="Complete">Complete</option>
                       </select>

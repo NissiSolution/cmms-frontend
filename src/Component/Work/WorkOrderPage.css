@@ -163,12 +163,14 @@ color: #1b2a4e;
   .work-order-table {
     width: 100%;
     border-collapse: collapse;
+    background-color:#f0f8ff; 
+    
   }
   
   .work-order-table th,
   .work-order-table td {
     padding: 10px;
-    border: 1px solid #ddd;
+    border: none;
     text-align: left;
   }
  

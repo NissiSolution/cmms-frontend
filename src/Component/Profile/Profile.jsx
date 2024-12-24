@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import SidebarComponent from '../sidebar/SidebarComponent';
 const Profile = () => {
   const [view, setView] = useState('personalInfo'); // 'personalInfo' or 'changePassword'
-  const userValue = useSelector((state) => state.user.users)
+  const userValue = useSelector((state) => state?.user.users)
   return (
     <div className="profile-page">
       {/* Sidebar */}

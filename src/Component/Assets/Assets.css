@@ -44,6 +44,8 @@ td {
   border-collapse: collapse;
   border: none;
   margin-top: 20px;
+  background-color:#f0f8ff; 
+    
 }
 
 .assets-list th, .assets-list td {

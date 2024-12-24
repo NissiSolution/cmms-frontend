@@ -26,7 +26,8 @@
   .location-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
+    background-color:#f0f8ff; 
+    
   }
   
   .location-table th, .location-table td {

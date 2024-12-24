@@ -163,7 +163,9 @@ const Assets = () => {
             <div className="modal">
               <h2>Asset Details</h2>
               <p><strong>Name:</strong> {currentAsset.name}</p>
+              <p><strong>Vendor company Name:</strong>{currentAsset.vendor}</p>
               <p><strong>SKU:</strong> {currentAsset.sku}</p>
+
               <p><strong>Asset Tag:</strong> {currentAsset.assetTag}</p>
               <p><strong>Category:</strong> {currentAsset.category}</p>
               <p><strong>Model:</strong> {currentAsset.model}</p>

@@ -37,7 +37,8 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    background-color: #f3f3f3;
+    background-color:#f0f8ff; 
+    
 
   }
 .employee-table th{
@@ -45,7 +46,6 @@
 }
   .employee-table th,
   .employee-table td {
-    border: 1px solid black;
     padding: 5px;
     text-align: center;
   }
@@ -54,15 +54,18 @@
     background-color: #1b2a4e;
     background-color: #1b2a4e;
     color: white;
-    padding: 8px;
+    padding: 7px;
+  }
+  .employee-table td{
+    border-bottom:1px solid black ;
   }
   th{
     background-color: #1b2a4e;
 
   }
   .edit-btn,
-  .delete-btn {
-    padding: 4px 6px;
+  .delete-btn,.btn-view {
+    padding: 3px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -70,16 +73,18 @@
   }
   
   .edit-btn {
-    background-color: #ffc107;
+    background-color: rgba(255, 193, 7,0.6);
     color: white;
   }
   
   .edit-btn:hover {
     background-color: #e0a800;
   }
-  
+.btn-view:hover{
+  background-color: rgb(204, 204, 204,0.6);
+}
   .delete-btn {
-    background-color: #dc3545;
+    background-color: rgba(220, 53, 69,0.7);
     color: white;
   }
   
@@ -142,13 +147,16 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    color: whitesmoke;
   }
   .attendance-options {
     margin-top: 15px;
     display: flex;
     justify-content: space-around;
   }
-  
+  .name{
+    width: 15%;
+  }
   .attendance-options label {
     display: flex;
     align-items: center;
@@ -160,3 +168,22 @@
   }
   
  
+  .main-content .search-bar{
+    width: 40%;
+  }
+  .btn-td {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 2px; /* Space between buttons */
+  }
+  .btn-view{
+    border: none;
+   color: #000;
+   cursor: pointer;
+   background-color: #ccc;
+   border-radius: 5px;
+   padding: 2px;
+  }
+  .slno{
+    width: 5%;
+  }
