@@ -64,6 +64,7 @@ const PartsPage = () => {
       if (remark) {
         await axios.post("https://cmms-backend-1.onrender.com/api/remark", {
           asset_id: selectedAsset.id,
+          asset_name:selectedAsset.name,
           stock: parseInt(subtractQuantity),
           remark,
         });
