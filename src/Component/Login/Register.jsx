@@ -21,8 +21,11 @@ const navigate=useNavigate()
         },
         withCredentials: true
       });
-      console.log(response.data);
-       navigate('/')
+      if (response.status===200)
+      {
+        navigate('/')
+
+      }
     } catch (err) {
       console.error(err);
     } finally {

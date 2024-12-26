@@ -16,6 +16,7 @@ import AboutUs from './Component/About/AboutUs';
 import PrivacyPolicy from './Component/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Component/TermsAndConditions/TermsAndConditions';
 import Add from './Component/AddStock/Add';
+import RolesPage from './Component/Rolepage/RolePage';
 
 function App() {
   const auth = useSelector((state) => state.user?.auth);
@@ -41,7 +42,6 @@ function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path="/register" element={<Register />} />
         <Route path='/privacy' element={<PrivacyPolicy />} />
-
         <Route element={<ProtectedRoute allowedRoles={['admin', 'user', 'companyAdmin']} />}>
           <Route path="/dashboard/*" element={<DashboardComponent />} />
           <Route path='/profile' element={<Profile />} />
@@ -49,6 +49,7 @@ function App() {
           <Route path='/work-order' element={<WorkOrderPage />} />
           <Route path='/stock' element={<Assets />} />
           <Route path='/vendor' element={<Vendor />} />
+
         </Route>
 
         {/* Restrict access to specific roles */}
@@ -56,6 +57,8 @@ function App() {
           <Route path='/employee' element={<Employee />} />
           <Route path='/add-stock' element={<Add />} />
           <Route path='/stock-out' element={<PartsPage />} />
+        <Route path="/role" element={<RolesPage/>}/>
+
         </Route>
       </Routes>
     </Router>

@@ -11,6 +11,7 @@ const Employee = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState({});
   const [editIndex, setEditIndex] = useState(null);
+  const [editID,setEditId]=useState()
   const [workOrders, setWorkOrders] = useState([]);
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [attendanceStatus, setAttendanceStatus] = useState('Present');
@@ -30,6 +31,8 @@ const Employee = () => {
   };
 
   useEffect(() => {
+    const today = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+    setSelectedDate(today);
     const fetchEmployees = async () => {
       try {
         const employeeResponse = await axios.get('https://cmms-backend-1.onrender.com/api/emp/get', {
@@ -57,11 +60,23 @@ const Employee = () => {
     }
   };
 
-  const openModal = (employee = {}, index = null) => {
-    setCurrentEmployee(employee);
+  const openModal = (employee={},index=null) => {
+  
     setEditIndex(index);
     setIsModalOpen(true);
     setEmpPhoto(null); // Reset photo state when opening modal
+    if (employee) {
+      setCurrentEmployee(employee);
+
+      const foundEmployee = employees?.find(emp => emp.emp_id === employee.emp_id);
+      if (foundEmployee) {
+          setEditId(foundEmployee?.id);
+      } else {
+          setEditId(null);
+      }
+  } else {
+      setEditId(null); 
+  }
   };
 
   const closeModal = () => {
@@ -83,71 +98,100 @@ const Employee = () => {
     setEmpPhoto(e.target.files[0]); // Set the selected file
   };
 
-  const handleSubmit = async (e) => {
+
+
+const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(); // Create a FormData object
 
-    // Append employee data to FormData
-    formData.append('name', currentEmployee.name);
-    formData.append('emp_id', currentEmployee.emp_id);
-    formData.append('department', currentEmployee.department);
-    formData.append('dateofjoin', currentEmployee.dateofjoin);
-    formData.append('skillset', currentEmployee.skillset);
-    formData.append('email', currentEmployee.email);
-    formData.append('phone', currentEmployee.phone);
-    
-    if (empPhoto) {
-        formData.append('emp_photo', empPhoto); // Append the employee photo if it exists
-    }
+    // Check if we are editing or creating
+    if (editIndex !== null) {
+        // Update existing employee
 
-    try {
-        if (editIndex !== null) {
-            // Update existing employee
-            const response = await axios.put(
-                `https://nissicmms.digidiary.in/api/emp_api.php`, // Ensure the URL is correct
-                formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                    withCredentials: true, // Include credentials if needed
-                }
-            );
-
-            // Update the employees state
-            const updatedEmployees = [...employees];
-            updatedEmployees[editIndex] = response.data; // Update the specific employee
-            setEmployees(updatedEmployees);
-        } else {
-            // Create new employee
-            const response = await axios.post(
-                `https://nissicmms.digidiary.in/api/emp_api.php`, // Ensure the URL is correct
-                formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                    withCredentials: true, // Include credentials if needed
-                }
-            );
-
-            // After creating the employee, create the user in the login API
-            const userData = {
-                email: currentEmployee.email,
-                password: currentEmployee.password, // Ensure you have a password field in your form
-                role: 'user',
-            };
-
-            await axios.post("https://cmms-backend-1.onrender.com/api/post", userData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
-
-            // Update the employees state
-            setEmployees((prev) => [...prev, response.data]);
+        if (!editID) {
+            console.error("Employee not found");
+            return;
         }
-        closeModal(); // Close the modal after submission
-    } catch (err) {
-        console.error('Error saving employee:', err);
+
+        // Append employee data to FormData
+        formData.append('_method', 'PUT'); // Simulate PUT request for PHP
+        formData.append('id', editID); // Include the employee ID
+        formData.append('name', currentEmployee.name);
+        formData.append('emp_id', currentEmployee.emp_id);
+        formData.append('department', currentEmployee.department);
+        formData.append('dateofjoin', currentEmployee.dateofjoin);
+        formData.append('skillset', currentEmployee.skillset);
+        formData.append('email', currentEmployee.email);
+        formData.append('phone', currentEmployee.phone);
+        formData.append('password', currentEmployee.password);
+
+        if (empPhoto) {
+            formData.append('emp_photo', empPhoto); // Include photo if provided
+        }
+
+        try {
+            const response = await axios.post(
+                'https://nissicmms.digidiary.in/api/emp_api.php',
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+
+
+            if (response.data.message) {
+                // Update the employees state with the new data
+                const updatedEmployees = [...employees];
+                updatedEmployees[editIndex] = { ...editID, ...currentEmployee };
+                setEmployees(updatedEmployees);
+                console.log("Employee updated successfully");
+            } else {
+                console.error('Error updating employee:', response.data.error);
+            }
+        } catch (error) {
+            console.error("Error updating employee:", error);
+        }
+    } else {
+        // Create new employee
+        // Append employee data to FormData
+        formData.append('name', currentEmployee.name);
+        formData.append('emp_id', currentEmployee.emp_id);
+        formData.append('department', currentEmployee.department);
+        formData.append('dateofjoin', currentEmployee.dateofjoin);
+        formData.append('skillset', currentEmployee.skillset);
+        formData.append('email', currentEmployee.email);
+        formData.append('phone', currentEmployee.phone);
+        formData.append('password', currentEmployee.password);
+
+        if (empPhoto) {
+            formData.append('emp_photo', empPhoto); // Include photo if provided
+        }
+
+        try {
+            const response = await axios.post(
+                'https://nissicmms.digidiary.in/api/emp_api.php',
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+
+            console.log(response.data);
+
+            if (response.data.message) {
+                // Add the new employee to the state
+                setEmployees(prev => [...prev, response.data]);
+                console.log("Employee created successfully");
+            } else {
+                console.error('Error creating employee:', response.data.error);
+            }
+        } catch (error) {
+            console.error("Error creating employee:", error);
+        }
     }
+
+    // Close the modal after submission
+    closeModal();
 };
 
   const openAttendanceModal = (employeeId) => {
@@ -187,6 +231,7 @@ const Employee = () => {
       console.error('Error fetching attendance:', err);
     }
   };
+
 
   const openAttendancePopup = () => {
     setIsAttendancePopupOpen(true);
@@ -244,12 +289,13 @@ const Employee = () => {
             <tbody>
               {employees
                 ?.filter(employee => {
-                  const lowerCaseQuery = searchQuery.toLowerCase();                  return (
-                    employee.name.toLowerCase().includes(lowerCaseQuery) ||
-                    employee.emp_id.toLowerCase().includes(lowerCaseQuery)
+                  const lowerCaseQuery = searchQuery?.toLowerCase();                  
+                  return (
+                   ( employee.name &&employee.name.toLowerCase()?.includes(lowerCaseQuery)) ||
+                    (employee.emp_id &&employee.emp_id.toLowerCase()?.includes(lowerCaseQuery))
                   );
                 })
-                .map((employee, index) => {
+                ?.map((employee, index) => {
                   const assignedWorkOrder = workOrders.find(work => work.assigned === employee.name);
                   const recentWorkOrder = assignedWorkOrder ? assignedWorkOrder.name : 'N/A';
 
@@ -260,7 +306,7 @@ const Employee = () => {
 
                   return (
                     <tr key={employee.id}>
-                      <td className='slno'>{employee.id}</td>
+                      <td className='slno'>{index+1}</td>
                       <td className='name'>{employee.name}</td>
                       <td>{employee.emp_id}</td>
                       <td>{employee.department}</td>
@@ -362,16 +408,18 @@ const Employee = () => {
                   required
                 />
               </label>
-              <label>
-                Create Password:
-                <input
-                  type="password"
-                  name="password"
-                  value={currentEmployee.password || ''}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
+              {editIndex===null && (
+          <label>
+            Create Password:
+            <input
+              type="password"
+              name="password"
+              value={currentEmployee.password || ''}
+              onChange={handleInputChange}
+              required
+            />
+          </label>
+        )}
               <label>
                 Employee Photo:
                 <input
@@ -490,7 +538,7 @@ const Employee = () => {
                       <tr key={index}>
                         <td>{employeeName}</td>
                         <td>{trimmedDate}</td>
-                        <td>{record.status}</td>
+                        <td className={`${record.status==='Present'?'present':'absent'}`}>{record.status}</td>
                       </tr>
                     );
                   })}
@@ -506,22 +554,38 @@ const Employee = () => {
 
       {/* Modal for Viewing Employee Details */}
       {isDetailsModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Employee Details</h2>
-            <p><strong>Name:</strong> {selectedEmployeeDetails.name}</p>
-            <p><strong>Employee ID:</strong> {selectedEmployeeDetails.emp_id}</p>
-            <p><strong>Department:</strong> {selectedEmployeeDetails.department}</p>
-            <p><strong>Date of Join:</strong> {formatDate(selectedEmployeeDetails.dateofjoin)}</p>
-            <p><strong>Skillset:</strong> {selectedEmployeeDetails.skillset}</p>
-            <p><strong>Email:</strong> {selectedEmployeeDetails.email}</p>
-            <p><strong>Phone:</strong> {selectedEmployeeDetails.phone}</p>
-            <div className="modal-actions">
-              <button onClick={closeDetailsModal}>Close</button>
-            </div>
-          </div>
+  <div className="modal-overlay">
+    <div className="modal emp_model">
+      <h2>Employee Details</h2>
+      <div className="employee-details">
+        <div className="details-left">
+          <p><strong>Name:</strong> {selectedEmployeeDetails.name}</p>
+          <p><strong>Employee ID:</strong> {selectedEmployeeDetails.emp_id}</p>
+          <p><strong>Department:</strong> {selectedEmployeeDetails.department}</p>
+          <p><strong>Date of Join:</strong> {formatDate(selectedEmployeeDetails.dateofjoin)}</p>
+          <p><strong>Skillset:</strong> {selectedEmployeeDetails.skillset}</p>
+          <p><strong>Email:</strong> {selectedEmployeeDetails.email}</p>
+          <p><strong>Phone:</strong> {selectedEmployeeDetails.phone}</p>
         </div>
-      )}
+        <div className="details-right">
+          <figure>
+            <img 
+              src={selectedEmployeeDetails.emp_photo 
+                ? `https://nissicmms.digidiary.in/api/${selectedEmployeeDetails.emp_photo}` 
+                : `https://nissicmms.digidiary.in/api/uploads/user.png`} // Path to your default profile icon
+              alt={`${selectedEmployeeDetails.name}`} 
+              className="employee-photo" 
+            />
+          </figure>
+        </div>
+      </div>
+      <div className="modal-actions">
+        <button onClick={closeDetailsModal}>Close</button>
+      </div>
+      
+    </div>
+  </div>
+)}
     </div>
   );
 }

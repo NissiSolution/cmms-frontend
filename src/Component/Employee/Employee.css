@@ -52,7 +52,6 @@
   
   .employee-table th {
     background-color: #1b2a4e;
-    background-color: #1b2a4e;
     color: white;
     padding: 7px;
   }
@@ -118,8 +117,8 @@
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    width: 100%;
   }
-  
   .cancel-btn,
   .save-btn {
     padding: 10px 20px;
@@ -167,7 +166,19 @@
     margin-right: 5px;
   }
   
- 
+ .attendance-popup-table th{
+ color: whitesmoke;
+ background: #000;
+ }
+ .attendance-popup-table td{
+  color: #333;
+ }
+ .attendance-popup-table .present{
+  color: greenyellow;
+ }
+ .attendance-popup-table .absent{
+  color: tomato;
+ }
   .main-content .search-bar{
     width: 40%;
   }
@@ -186,4 +197,42 @@
   }
   .slno{
     width: 5%;
+  }
+ 
+   .emp_mode{
+    width: 600px; /* Set a medium width for the modal */
+    max-width: 90%; /* Responsive max width */
+    margin: auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .employee-details {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between left and right */
+    align-items: center; /* Center items vertically */
+  }
+  
+  .details-left {
+    flex: 1; /* Take up remaining space */
+    margin-right: 20px; /* Space between text and image */
+  }
+  
+  .details-right {
+    flex: 0 0 150px; /* Fixed width for the image container */
+  }
+  
+  .employee-photo {
+    width: 200px; /* Make the image responsive */
+    height: auto; /* Maintain aspect ratio */
+   /* Make the image circular */
+    object-fit: cover; /* Cover the area without distortion */
+  }
+  
+  /* Default profile icon styles */
+  .employee-photo .default {
+    width: 100px; /* Set a fixed size for the default icon */
+    height: 100px; /* Set a fixed size for the default icon */
   }

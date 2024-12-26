@@ -173,7 +173,10 @@ color: #1b2a4e;
     border: none;
     text-align: left;
   }
- 
+ .work-order-table th{
+  background-color: #1b2a4e;
+
+ }
   
   .priority.low {
     color: green;

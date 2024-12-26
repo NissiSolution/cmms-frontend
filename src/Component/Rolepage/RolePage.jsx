@@ -1,63 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import SidebarComponent from '../sidebar/SidebarComponent';
 import './RolePage.css';
 
 const RolesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roles, setRoles] = useState([
-    {
-      name: 'Role-1',
-      permissions: [
-        'manage assets',
-        'create assets',
-        'edit assets',
-        'manage parts',
-        'create parts',
-        'edit parts',
-        'manage pms',
-        'manage vendor',
-        'manage pos',
-        'manage wos',
-        'manage logtime',
-      ],
-    },
-  ]);
+  const [roles, setRoles] = useState([]);
+
+  const modules = [
+    { name: 'stock', permissions: ['view','create', 'edit', 'delete'] },
+    { name: 'stock-out', permissions: [ 'view','create', 'edit', 'delete'] },
+    { name: 'work', permissions: [ 'view','create', 'edit', 'delete'] },
+    { name: 'Vendor', permissions: [ 'view','create', 'edit', 'delete'] },
+  ];
 
   const [newRole, setNewRole] = useState({
     name: '',
-    permissions: [],
+    permissions: {},
   });
-
-  const [permissionInput, setPermissionInput] = useState('');
 
   // Modal Control
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setNewRole({ name: '', permissions: {} });
+  };
 
-  // Handle Role Input
-  const handleInputChange = (e) => {
+  // Handle Role Name Input
+  const handleRoleNameChange = (e) => {
     setNewRole({ ...newRole, name: e.target.value });
   };
 
-  // Handle Permission Addition
-  const addPermission = () => {
-    if (permissionInput.trim()) {
-      setNewRole((prev) => ({
-        ...prev,
-        permissions: [...prev.permissions, permissionInput],
-      }));
-      setPermissionInput('');
-    }
+  // Handle Permission Toggle
+  const togglePermission = (module, permission) => {
+    setNewRole((prev) => {
+      const updatedPermissions = { ...prev.permissions };
+      if (!updatedPermissions[module]) {
+        updatedPermissions[module] = [];
+      }
+      if (updatedPermissions[module].includes(permission)) {
+        updatedPermissions[module] = updatedPermissions[module].filter((perm) => perm !== permission);
+      } else {
+        updatedPermissions[module].push(permission);
+      }
+      return { ...prev, permissions: updatedPermissions };
+    });
   };
 
   // Handle Submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newRole.name && newRole.permissions.length > 0) {
+    if (newRole.name) {
       setRoles([...roles, newRole]);
-      setNewRole({ name: '', permissions: [] }); // Reset form
-      setIsModalOpen(false);
+      closeModal();
     }
+    console.log(roles);
+    
   };
 
   // Delete Role
@@ -75,7 +72,7 @@ const RolesPage = () => {
           <h1>Manage Roles</h1>
         </header>
 
-        {/* Roles List as a Table */}
+        {/* Roles List */}
         <section className="roles-list">
           <table>
             <thead>
@@ -88,15 +85,15 @@ const RolesPage = () => {
             <tbody>
               {roles.map((role, index) => (
                 <tr key={index}>
-                  <td className='name-role'>{role.name}</td>
+                  <td>{role.name}</td>
                   <td>
-                    {role.permissions.map((perm, i) => (
-                      <span key={i} className="permission-tag">
-                        {perm}
-                      </span>
+                    {Object.entries(role.permissions).map(([module, perms]) => (
+                      <div key={module}>
+                        <strong>{module}:</strong> {perms.join(', ')}
+                      </div>
                     ))}
                   </td>
-                  <td className="actions">
+                  <td>
                     <button className="delete-btn" onClick={() => deleteRole(index)}>
                       🗑️
                     </button>
@@ -122,32 +119,36 @@ const RolesPage = () => {
                 <input
                   type="text"
                   value={newRole.name}
-                  onChange={handleInputChange}
+                  onChange={handleRoleNameChange}
                   placeholder="Enter Role Name"
                   required
                 />
               </label>
-              <label>
-                Add Permission
-                <div className="permission-input">
-                  <input
-                    type="text"
-                    value={permissionInput}
-                    onChange={(e) => setPermissionInput(e.target.value)}
-                    placeholder="Enter Permission"
-                  />
-                  <button type="button" onClick={addPermission}>
-                    Add
-                  </button>
-                </div>
-              </label>
-              <div className="permissions-list">
-                {newRole.permissions.map((perm, i) => (
-                  <span key={i} className="permission-tag">
-                    {perm}
-                  </span>
+
+              <div className="permissions-grid">
+                {modules.map((module) => (
+                  <div key={module.name} className="module-permissions">
+                  <div className='module-first-div'>
+                  <h3>{module.name}</h3>
+
+                  </div>
+                    {module.permissions.map((perm) => (
+                      <label key={perm} className='role-table'>
+                        <div>
+                        <input
+                          type="checkbox"
+                          checked={newRole.permissions[module.name]?.includes(perm) || false}
+                          onChange={() => togglePermission(module.name, perm)}
+                        />
+                        </div>
+                       
+                       <div>{perm}</div> 
+                      </label>
+                    ))}
+                  </div>
                 ))}
               </div>
+
               <div className="modal-actions">
                 <button type="button" onClick={closeModal}>
                   Close

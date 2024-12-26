@@ -12,6 +12,10 @@
   border: 1px solid #ddd;
   text-align: left;
 }
+.assets-list th{
+  background-color: #1b2a4e;
+
+}
 th {
   background-color: #1b2a4e; /* Dark blue background */
   color: #ffffff; /* White text color */

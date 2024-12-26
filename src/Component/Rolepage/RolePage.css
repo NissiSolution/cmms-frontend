@@ -11,6 +11,15 @@
   margin-bottom: 20px;
 }
 
+.module-permissions {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+    
+}
+
 .roles-list {
   width: 100%;
 }
@@ -25,11 +34,14 @@ table {
 th, td {
   padding: 15px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
 }
+td{
+  border-bottom: 1px solid #ddd;
 
+}
 th {
-  background-color: #f2f2f2;
+  background-color: #1b2a4e;
+
 }
 
 .permission-tag {
@@ -60,4 +72,28 @@ th {
   padding: 10px;
   text-align: center;
   margin-top: 10px;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+.module-permissions {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.module-permissions h3 {
+  margin-bottom: 10px;
+  color: #000;
+}
+.role-table{
+  display: flex;
+  justify-content: center;
+}
+.module-first-div{
+  width: 90px;
 }
