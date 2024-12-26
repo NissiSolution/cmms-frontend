@@ -19,6 +19,7 @@ const Employee = () => {
   const [isAttendancePopupOpen, setIsAttendancePopupOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
+  const [empPhoto, setEmpPhoto] = useState(null); // State for employee photo
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -60,12 +61,14 @@ const Employee = () => {
     setCurrentEmployee(employee);
     setEditIndex(index);
     setIsModalOpen(true);
+    setEmpPhoto(null); // Reset photo state when opening modal
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentEmployee({});
     setEditIndex(null);
+    setEmpPhoto(null); // Reset photo state when closing modal
   };
 
   const handleInputChange = (e) => {
@@ -76,37 +79,76 @@ const Employee = () => {
     }));
   };
 
+  const handlePhotoChange = (e) => {
+    setEmpPhoto(e.target.files[0]); // Set the selected file
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (editIndex !== null) {
-        const response = await axios.put(
-          `https://cmms-backend-1.onrender.com/api/emp/${currentEmployee.id}`,
-          currentEmployee,
-          {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true,
-          }
-        );
-        const updatedEmployees = [...employees];
-        updatedEmployees[editIndex] = response.data;
-        setEmployees(updatedEmployees);
-      } else {
-        const response = await axios.post(
-          'https://cmms-backend-1.onrender.com/api/emp/post',
-          currentEmployee,
-          {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true,
-          }
-        );
-        setEmployees((prev) => [...prev, response.data]);
-      }
-      closeModal();
-    } catch (err) {
-      console.error('Error saving employee:', err);
+    const formData = new FormData(); // Create a FormData object
+
+    // Append employee data to FormData
+    formData.append('name', currentEmployee.name);
+    formData.append('emp_id', currentEmployee.emp_id);
+    formData.append('department', currentEmployee.department);
+    formData.append('dateofjoin', currentEmployee.dateofjoin);
+    formData.append('skillset', currentEmployee.skillset);
+    formData.append('email', currentEmployee.email);
+    formData.append('phone', currentEmployee.phone);
+    
+    if (empPhoto) {
+        formData.append('emp_photo', empPhoto); // Append the employee photo if it exists
     }
-  };
+
+    try {
+        if (editIndex !== null) {
+            // Update existing employee
+            const response = await axios.put(
+                `https://nissicmms.digidiary.in/api/emp_api.php`, // Ensure the URL is correct
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    withCredentials: true, // Include credentials if needed
+                }
+            );
+
+            // Update the employees state
+            const updatedEmployees = [...employees];
+            updatedEmployees[editIndex] = response.data; // Update the specific employee
+            setEmployees(updatedEmployees);
+        } else {
+            // Create new employee
+            const response = await axios.post(
+                `https://nissicmms.digidiary.in/api/emp_api.php`, // Ensure the URL is correct
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    withCredentials: true, // Include credentials if needed
+                }
+            );
+
+            // After creating the employee, create the user in the login API
+            const userData = {
+                email: currentEmployee.email,
+                password: currentEmployee.password, // Ensure you have a password field in your form
+                role: 'user',
+            };
+
+            await axios.post("https://cmms-backend-1.onrender.com/api/post", userData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: true,
+            });
+
+            // Update the employees state
+            setEmployees((prev) => [...prev, response.data]);
+        }
+        closeModal(); // Close the modal after submission
+    } catch (err) {
+        console.error('Error saving employee:', err);
+    }
+};
 
   const openAttendanceModal = (employeeId) => {
     setSelectedEmployeeId(employeeId);
@@ -189,12 +231,12 @@ const Employee = () => {
           <table>
             <thead>
               <tr>
-                <th className='slno' >SLNO</th>
+                <th className='slno'>SLNO</th>
                 <th>Name</th>
                 <th>Employee ID</th>
                 <th>Department</th>
-                <th>Today'sStatus</th>
-                 <th>skillSet</th>  
+                <th>Today's Status</th>
+                <th>Skill Set</th>
                 <th>Recent Work Order</th>
                 <th>Actions</th>
               </tr>
@@ -202,8 +244,7 @@ const Employee = () => {
             <tbody>
               {employees
                 ?.filter(employee => {
-                  const lowerCaseQuery = searchQuery.toLowerCase();
-                  return (
+                  const lowerCaseQuery = searchQuery.toLowerCase();                  return (
                     employee.name.toLowerCase().includes(lowerCaseQuery) ||
                     employee.emp_id.toLowerCase().includes(lowerCaseQuery)
                   );
@@ -227,7 +268,7 @@ const Employee = () => {
                       <td>{employee.skillset}</td>
                       <td>{recentWorkOrder}</td>
                       <td className='btn-td'>
-                      <button className="btn-view" onClick={() => openDetailsModal(employee)}>
+                        <button className="btn-view" onClick={() => openDetailsModal(employee)}>
                           View Details
                         </button>
                         <button className="edit-btn" onClick={() => openModal(employee, index)}>
@@ -236,7 +277,6 @@ const Employee = () => {
                         <button className="attendance-btn" onClick={() => openAttendanceModal(employee.id)}>
                           Attendance
                         </button>
-                       
                       </td>
                     </tr>
                   );
@@ -246,6 +286,7 @@ const Employee = () => {
         </div>
       </div>
 
+      {/* Modal for Adding/Editing Employee */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
@@ -262,7 +303,7 @@ const Employee = () => {
                 />
               </label>
               <label>
-                EmployeeID:
+                Employee ID:
                 <input
                   type="text"
                   name="emp_id"
@@ -321,7 +362,25 @@ const Employee = () => {
                   required
                 />
               </label>
-
+              <label>
+                Create Password:
+                <input
+                  type="password"
+                  name="password"
+                  value={currentEmployee.password || ''}
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
+              <label>
+                Employee Photo:
+                <input
+                  type="file"
+                  name="emp_photo"
+                  accept="image/*"
+                  onChange={handlePhotoChange} // Handle photo change
+                />
+              </label>
               <div className="modal-actions">
                 <button type="button" className="cancel-btn" onClick={closeModal}>
                   Cancel
@@ -335,10 +394,11 @@ const Employee = () => {
         </div>
       )}
 
+      {/* Modal for Marking Attendance */}
       {isAttendanceModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>Mark Attendance</h2>
+          <h2>Mark Attendance</h2>
             <p>Select attendance status for this employee:</p>
             <div className="attendance-options">
               <label>
@@ -374,6 +434,7 @@ const Employee = () => {
         </div>
       )}
 
+      {/* Modal for Viewing Attendance */}
       {isAttendancePopupOpen && (
         <div className="modal-overlay">
           <div className="modal">
@@ -443,6 +504,7 @@ const Employee = () => {
         </div>
       )}
 
+      {/* Modal for Viewing Employee Details */}
       {isDetailsModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
