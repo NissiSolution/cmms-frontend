@@ -1,5 +1,6 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import SidebarComponent from '../sidebar/SidebarComponent';
+import axios from 'axios';
 import './RolePage.css';
 
 const RolesPage = () => {
@@ -7,16 +8,30 @@ const RolesPage = () => {
   const [roles, setRoles] = useState([]);
 
   const modules = [
-    { name: 'stock', permissions: ['view','create', 'edit', 'delete'] },
-    { name: 'stock-out', permissions: [ 'view','create', 'edit', 'delete'] },
-    { name: 'work', permissions: [ 'view','create', 'edit', 'delete'] },
-    { name: 'Vendor', permissions: [ 'view','create', 'edit', 'delete'] },
+    { name: 'stock', permissions: ['view', 'create', 'edit', 'delete'] },
+    { name: 'stock-out', permissions: ['view', 'create', 'edit', 'delete'] },
+    { name: 'work', permissions: ['view', 'create', 'edit', 'delete'] },
+    { name: 'vendor', permissions: ['view', 'create', 'edit', 'delete'] },
   ];
 
   const [newRole, setNewRole] = useState({
     name: '',
     permissions: {},
   });
+
+  // Fetch roles from the backend
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get('https://cmms-backend-1.onrender.com/api/roles');
+        setRoles(response.data);
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+      }
+    };
+    fetchRoles();
+  }, []);
+console.log(roles);
 
   // Modal Control
   const openModal = () => setIsModalOpen(true);
@@ -46,21 +61,42 @@ const RolesPage = () => {
     });
   };
 
-  // Handle Submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (newRole.name) {
-      setRoles([...roles, newRole]);
-      closeModal();
-    }
-    console.log(roles);
+  // Handle Submit to add a new role
+  const handleSubmit = async (e) => {
+    console.log(newRole.name);
     
+    e.preventDefault();
+    try {
+      if (newRole.name) {
+           const data={
+            name:newRole.name,
+            permissions:newRole.permissions,
+          }
+          console.log(data);
+          
+        await axios.post('https://cmms-backend-1.onrender.com/api/roles/post',data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true
+        })
+        
+        closeModal();
+      }
+    } catch (error) {
+      console.error('Error adding role:', error);
+    }
   };
 
   // Delete Role
-  const deleteRole = (index) => {
-    const updatedRoles = roles.filter((_, i) => i !== index);
-    setRoles(updatedRoles);
+  const deleteRole = async (id) => {
+    try {
+      await axios.delete(`https://cmms-backend-1.onrender.com/api/roles/${id}`);
+      const response = await axios.get('https://cmms-backend-1.onrender.com/api/roles'); // Refresh the list
+      setRoles(response.data);
+    } catch (error) {
+      console.error('Error deleting role:', error);
+    }
   };
 
   return (
@@ -85,16 +121,16 @@ const RolesPage = () => {
             <tbody>
               {roles.map((role, index) => (
                 <tr key={index}>
-                  <td>{role.name}</td>
+                  <td>{role?.name}</td>
                   <td>
-                    {Object.entries(role.permissions).map(([module, perms]) => (
+                    {Object.entries(role?.permissions).map(([module, perms]) => (
                       <div key={module}>
                         <strong>{module}:</strong> {perms.join(', ')}
                       </div>
                     ))}
                   </td>
                   <td>
-                    <button className="delete-btn" onClick={() => deleteRole(index)}>
+                    <button className="delete-btn" onClick={() => deleteRole(role.id)}>
                       🗑️
                     </button>
                   </td>
@@ -128,21 +164,19 @@ const RolesPage = () => {
               <div className="permissions-grid">
                 {modules.map((module) => (
                   <div key={module.name} className="module-permissions">
-                  <div className='module-first-div'>
-                  <h3>{module.name}</h3>
-
-                  </div>
+                    <div className="module-first-div">
+                      <h3>{module.name}</h3>
+                    </div>
                     {module.permissions.map((perm) => (
-                      <label key={perm} className='role-table'>
+                      <label key={perm} className="role-table">
                         <div>
-                        <input
-                          type="checkbox"
-                          checked={newRole.permissions[module.name]?.includes(perm) || false}
-                          onChange={() => togglePermission(module.name, perm)}
-                        />
+                          <input
+                            type="checkbox"
+                            checked={newRole.permissions[module.name]?.includes(perm) || false}
+                            onChange={() => togglePermission(module.name, perm)}
+                          />
                         </div>
-                       
-                       <div>{perm}</div> 
+                        <div>{perm}</div>
                       </label>
                     ))}
                   </div>
