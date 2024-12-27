@@ -95,6 +95,29 @@ const WorkOrderPage = () => {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
+
+  const userRole=useSelector((state)=>state?.user.userRole)
+  
+  const checkAllPermissions = (userRole, module, action) => {
+    if (!userRole || !userRole.permissions) return false; // Return false if no permissions
+  
+    // Check if the module exists and includes the action
+    return userRole.permissions[module]?.includes(action) || false;
+  };
+  ;
+
+  const hasPermissionEdit=checkAllPermissions(userRole,'work','edit')
+  const hasPermissionView=checkAllPermissions(userRole,'work','view')
+  
+  // const hasPermissionDelete=checkAllPermissions(userRole,'work','delete')
+  const hasPermissionAdd=checkAllPermissions(userRole,'work','add')
+
+
+  const canAdd = hasPermissionAdd || (role === 'admin' || role === 'companyAdmin');
+  const canEdit=hasPermissionEdit || (role === 'admin' || role === 'companyAdmin');
+  const canView=hasPermissionView || (role ==='admin' || role ==='companyAdmin')
+  // const canDelete=hasPermissionDelete ||(role ==='admin' || role==='companyAdmin') 
+
   return (
     <div className="work-order-container">
       <SidebarComponent />
@@ -102,7 +125,7 @@ const WorkOrderPage = () => {
       <div className="work-order-content">
         <header className="header">
           <h1>Work Orders</h1>
-          {role !== 'user' && (
+          {canAdd&& (
             <button className="add-btn" onClick={() => openModal()}>
  + Add Work Order
           </button>
@@ -158,10 +181,15 @@ const WorkOrderPage = () => {
                 <td>{formatDate(order.start_date)}</td>
                 <td>{formatDate(order.deadline)}</td>
                 <td>
-                  <button className="action-btn view" onClick={() => openModal(order, index, true)}>
+                  {canView &&(
+                    <>
+                        <button className="action-btn view" onClick={() => openModal(order, index, true)}>
                     <FaEye />
                   </button>
-                  {role !== 'user' && (
+                    </>
+                  )}
+              
+                  {canEdit && (
                     <button className="action-btn edit" onClick={() => openModal(order, index)}>
                       <FaEdit />
                     </button>

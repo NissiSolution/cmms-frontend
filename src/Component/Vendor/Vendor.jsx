@@ -3,6 +3,8 @@ import axios from "axios"; // For API calls
 import SidebarComponent from "../sidebar/SidebarComponent";
 import "./Vendor.css";
 import { FaEye,  FaTrashAlt } from 'react-icons/fa'; // Icons
+// import { hasPermission } from "../functions/hasPermission";
+import { useSelector } from "react-redux";
 
 const Vendor = () => {
   const [vendors, setVendors] = useState([]);
@@ -15,7 +17,28 @@ const Vendor = () => {
   useEffect(() => {
     fetchVendors();
   }, []);
+  const userRole=useSelector((state)=>state?.user.userRole)
+  
+  const checkAllPermissions = (userRole, module, action) => {
+    if (!userRole || !userRole.permissions) return false; // Return false if no permissions
+  
+    // Check if the module exists and includes the action
+    return userRole.permissions[module]?.includes(action) || false;
+  };
+  ;
 
+  // const hasPermissionEdit=checkAllPermissions(userRole,'vendor','edit')
+  const hasPermissionView=checkAllPermissions(userRole,'vendor','view')
+  
+ const hasPermissionDelete=checkAllPermissions(userRole,'vendor','delete')
+  const hasPermissionAdd=checkAllPermissions(userRole,'vendor','add')
+console.log(userRole);
+
+
+  const canAdd = hasPermissionAdd || (role === 'admin' || role === 'companyAdmin');
+  // const canEdit=hasPermissionEdit || (role === 'admin' || role === 'companyAdmin');
+  const canView=hasPermissionView || (role ==='admin' || role ==='companyAdmin')
+ const canDelete=hasPermissionDelete ||(role ==='admin' || role==='companyAdmin') 
   const fetchVendors = async () => {
     try {
       const response = await axios.get('https://cmms-backend-1.onrender.com/api/vendors/get');
@@ -81,7 +104,7 @@ const Vendor = () => {
       <div className="main-content">
         <header className="header">
           <h1>Vendors</h1>
-          {role!=='user'&&(<>
+          {canAdd &&(<>
 
           <button className="add-btn" onClick={() => openModal()}>
             + Add Vendor
@@ -110,10 +133,14 @@ const Vendor = () => {
                   <td>{vendor.email}</td>
                   <td>{vendor.phone}</td>
                   <td>
-                    <button className="action-btn view" onClick={() => openViewModal(vendor)}>
+                    {canView &&(<>
+                      <button className="action-btn view" onClick={() => openViewModal(vendor)}>
                       <FaEye />
                     </button>
-                    {role!=='user'&&(<>
+                    
+                    </>)}
+                   
+                    {canDelete&&(<>
 
                     <button className="action-btn delete" onClick={() => handleDelete(vendor.id)}>
                       <FaTrashAlt />

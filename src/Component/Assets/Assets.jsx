@@ -4,6 +4,7 @@ import axios from "axios";
 import SidebarComponent from "../sidebar/SidebarComponent";
 import { FaEye, FaTrashAlt, FaEdit } from 'react-icons/fa'; // Import FaEdit
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Assets = () => {
   const [assets, setAssets] = useState([]);
@@ -70,13 +71,37 @@ const Assets = () => {
     ? assets.filter((asset) => asset.name === selectedName)
     : assets;
 
+
+ const userRole=useSelector((state)=>state?.user.userRole)
+  console.log(userRole);
+  
+  const checkAllPermissions = (userRole, module, action) => {
+    if (!userRole || !userRole.permissions) return false; // Return false if no permissions
+  
+    // Check if the module exists and includes the action
+    return userRole.permissions[module]?.includes(action) || false;
+  };
+  ;
+
+  const hasPermissionEdit=checkAllPermissions(userRole,'stock','edit')
+  const hasPermissionView=checkAllPermissions(userRole,'stock','view')
+  
+ const hasPermissionDelete=checkAllPermissions(userRole,'stock','delete')
+  const hasPermissionAdd=checkAllPermissions(userRole,'stock','add')
+
+console.log(hasPermissionView);
+
+  const canAdd = hasPermissionAdd || (role === 'admin' || role === 'companyAdmin');
+  const canEdit=hasPermissionEdit || (role === 'admin' || role === 'companyAdmin');
+  const canView=hasPermissionView || (role ==='admin' || role ==='companyAdmin')
+   const canDelete=hasPermissionDelete ||(role ==='admin' || role==='companyAdmin') 
   return (
     <div className="Assets-page">
       <SidebarComponent />
       <div className="main-content">
         <header className="header">
           <h1>Inventory Management</h1>
-          {role!=='user'&&(
+          {canAdd&&(
           <button className="add-btn" onClick={() => navigate("/add-stock")}>
             + Add Asset
           </button>)}
@@ -130,13 +155,16 @@ const Assets = () => {
                       : "Out of Stock"}
                   </td>
                   <td>
-                    <button
+                    {canView &&(<>
+                      <button
                       className="action-btn view"
                       onClick={() => openViewModal(asset)}
                     >
                       <FaEye />
                     </button>
-                    {role!=='user'&&(
+                    </>)}
+                   
+                    {canEdit&&(
                       <>
                     <button
                       className="action-btn edit"
@@ -144,12 +172,17 @@ const Assets = () => {
                     >
                       <FaEdit />
                     </button> 
-                    <button
+                    {canDelete &&(<>
+                      <button
                       className="action-btn delete"
                       onClick={() => handleDelete(index)}
                     >
                       <FaTrashAlt />
-                    </button></>)}
+                    </button>
+                    </>
+                    
+                    )}
+                 </>)}
                   </td>
                 </tr>
               ))}

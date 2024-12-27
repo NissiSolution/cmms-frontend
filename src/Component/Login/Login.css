@@ -41,7 +41,7 @@ body {
 
 .header-links a:hover {
   color: #2196F3;
-  text-shadow: 0px 0px 2px rgba(33, 150, 243, 0.8);
+  text-shadow: 0px 0px 2px rgba(33, 150, 243, 0.5);
 }
 
 .language-selector {

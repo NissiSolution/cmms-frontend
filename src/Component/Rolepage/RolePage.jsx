@@ -9,7 +9,7 @@ const RolesPage = () => {
 
   const modules = [
     { name: 'stock', permissions: ['view', 'create', 'edit', 'delete'] },
-    { name: 'stock-out', permissions: ['view', 'create', 'edit', 'delete'] },
+    { name: 'stockOut', permissions: ['view', 'create', 'edit', 'delete'] },
     { name: 'work', permissions: ['view', 'create', 'edit', 'delete'] },
     { name: 'vendor', permissions: ['view', 'create', 'edit', 'delete'] },
   ];
@@ -24,13 +24,18 @@ const RolesPage = () => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get('https://cmms-backend-1.onrender.com/api/roles');
-        setRoles(response.data);
+        const parsedRoles = response.data.map(role => ({
+          ...role,
+          permissions: typeof role.permissions === "string" ? JSON.parse(role.permissions) : role.permissions,
+        }));
+        setRoles(parsedRoles);
       } catch (error) {
         console.error('Error fetching roles:', error);
       }
     };
     fetchRoles();
-  }, []);
+  }, [roles]);
+  
 console.log(roles);
 
   // Modal Control
@@ -121,11 +126,11 @@ console.log(roles);
             <tbody>
               {roles.map((role, index) => (
                 <tr key={index}>
-                  <td>{role?.name}</td>
+                  <td className='roles'>{role?.name}</td>
                   <td>
-                    {Object.entries(role?.permissions).map(([module, perms]) => (
+                    {Object.entries(role?.permissions)?.map(([module, perms]) => (
                       <div key={module}>
-                        <strong>{module}:</strong> {perms.join(', ')}
+                        <strong className='name-role'>{module}:</strong> <span className='span-role'>{perms?.join(', ')}</span>
                       </div>
                     ))}
                   </td>
@@ -150,7 +155,7 @@ console.log(roles);
           <div className="modal">
             <h2>Create New Role</h2>
             <form onSubmit={handleSubmit}>
-              <label>
+              <label>  
                 Role Name*
                 <input
                   type="text"
@@ -165,9 +170,9 @@ console.log(roles);
                 {modules.map((module) => (
                   <div key={module.name} className="module-permissions">
                     <div className="module-first-div">
-                      <h3>{module.name}</h3>
+                      <h3>{module?.name}</h3>
                     </div>
-                    {module.permissions.map((perm) => (
+                    {module.permissions?.map((perm) => (
                       <label key={perm} className="role-table">
                         <div>
                           <input

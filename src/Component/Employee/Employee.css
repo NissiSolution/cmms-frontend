@@ -236,3 +236,6 @@
     width: 100px; /* Set a fixed size for the default icon */
     height: 100px; /* Set a fixed size for the default icon */
   }
+  .role-btn{
+    margin-right: 40px;
+  }

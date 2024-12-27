@@ -71,8 +71,6 @@ const navigate=useNavigate()
               <label htmlFor="role">Role<span>*</span></label>
               <select id="role" required value={data.role} name='role' onChange={handleChange}>
                 <option value="">-- Select Role --</option>
-                <option value="admin">Super Admin</option>
-                <option value="companyAdmin">Company Admin</option>
                 <option value="user">User</option>
               </select>
 

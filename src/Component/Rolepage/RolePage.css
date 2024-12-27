@@ -97,3 +97,11 @@ th {
 .module-first-div{
   width: 90px;
 }
+.roles{
+  font-weight: bolder;
+  color:red
+}
+.span-role{
+   margin-left: 5px;
+   color: #6ce26c;
+}

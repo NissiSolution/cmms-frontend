@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Employee.css';
 import SidebarComponent from '../sidebar/SidebarComponent';
 import axios from 'axios';
+import {  useNavigate } from 'react-router-dom';
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -21,7 +22,7 @@ const Employee = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
   const [empPhoto, setEmpPhoto] = useState(null); // State for employee photo
-
+  const [roles,setRoles]=useState()
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -29,7 +30,16 @@ const Employee = () => {
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
   };
-
+  const getRole= async()=>{
+    const response=await axios.get('https://cmms-backend-1.onrender.com/api/roles',{
+      withCredentials: true,
+    })
+    const parsedRoles = response.data.map(role => ({
+      ...role,
+      permissions: typeof role.permissions === "string" ? JSON.parse(role.permissions) : role.permissions,
+    }));
+    setRoles(parsedRoles);
+  }
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
     setSelectedDate(today);
@@ -47,7 +57,8 @@ const Employee = () => {
     };
 
     fetchEmployees();
-  }, []);
+     getRole()
+  }, [employees]);
 
   const fetchRecentWorkOrders = async () => {
     try {
@@ -92,12 +103,22 @@ const Employee = () => {
       ...prev,
       [name]: value,
     }));
+    if (name === 'emp_id') {
+      checkUniqueEmpId(value);
+    }
+
   };
+  const checkUniqueEmpId = (empId) => {
+    const isUniqueId = !employees.some((employee) => employee.emp_id === empId);
+    setIsUnique(isUniqueId);
+  };
+  const [isUnique, setIsUnique] = useState(true);
 
   const handlePhotoChange = (e) => {
     setEmpPhoto(e.target.files[0]); // Set the selected file
   };
 
+console.log(currentEmployee.role);
 
 
 const handleSubmit = async (e) => {
@@ -124,6 +145,7 @@ const handleSubmit = async (e) => {
         formData.append('email', currentEmployee.email);
         formData.append('phone', currentEmployee.phone);
         formData.append('password', currentEmployee.password);
+        formData.append('role',currentEmployee.role)
 
         if (empPhoto) {
             formData.append('emp_photo', empPhoto); // Include photo if provided
@@ -162,6 +184,7 @@ const handleSubmit = async (e) => {
         formData.append('email', currentEmployee.email);
         formData.append('phone', currentEmployee.phone);
         formData.append('password', currentEmployee.password);
+        formData.append('role',currentEmployee.role)
 
         if (empPhoto) {
             formData.append('emp_photo', empPhoto); // Include photo if provided
@@ -176,12 +199,27 @@ const handleSubmit = async (e) => {
                 }
             );
 
-            console.log(response.data);
 
+            console.log(response.data);
+              const data={
+                name:currentEmployee.name,
+                email:currentEmployee.email,
+                password:currentEmployee.password,
+                role:'user'
+              }
             if (response.data.message) {
                 // Add the new employee to the state
                 setEmployees(prev => [...prev, response.data]);
                 console.log("Employee created successfully");
+
+
+                 await axios.post("https://cmms-backend-1.onrender.com/api/post", data, {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  withCredentials: true
+                })
+
             } else {
                 console.error('Error creating employee:', response.data.error);
             }
@@ -246,7 +284,7 @@ const handleSubmit = async (e) => {
     setIsDetailsModalOpen(false);
     setSelectedEmployeeDetails({});
   };
-
+const navigate=useNavigate();
   return (
     <div className="employee-page">
       <SidebarComponent />
@@ -254,6 +292,9 @@ const handleSubmit = async (e) => {
         <header className="header">
           <h1>Employee</h1>
           <div>
+          <button className="add-btn role-btn" onClick={() => navigate('/role') }>
+              + Add Role
+            </button>
             <button className="add-btn" onClick={() => openModal()}>
               + Add Employee
             </button>
@@ -358,6 +399,9 @@ const handleSubmit = async (e) => {
                   required
                 />
               </label>
+              {!isUnique && (
+        <p style={{ color: 'red' }}>This Employee ID is already in use. Please choose a unique ID.</p>
+      )}
               <label>
                 Department:
                 <input
@@ -388,6 +432,25 @@ const handleSubmit = async (e) => {
                   required
                 />
               </label>
+              <label>
+  Set Role:
+  <select
+    name="role"
+    value={currentEmployee.role || ''}
+    onChange={handleInputChange}
+    required
+  >
+    <option value="" disabled>
+      Select Role
+    </option>
+    {roles?.map((emp) => (
+      <option key={emp.id} value={emp.name}>
+        {emp.name}
+      </option>
+    ))}
+  </select>
+</label>
+
               <label>
                 Email:
                 <input

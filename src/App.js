@@ -51,12 +51,15 @@ function App() {
           <Route path='/vendor' element={<Vendor />} />
 
         </Route>
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'user', 'companyAdmin']} />}>
+        <Route path='/add-stock' element={<Add />} />
+        <Route path='/stock-out' element={<PartsPage />} />
+         </Route>
 
         {/* Restrict access to specific roles */}
         <Route element={<ProtectedRoute allowedRoles={['admin','companyAdmin']} />}>
           <Route path='/employee' element={<Employee />} />
-          <Route path='/add-stock' element={<Add />} />
-          <Route path='/stock-out' element={<PartsPage />} />
+         
         <Route path="/role" element={<RolesPage/>}/>
 
         </Route>

@@ -87,8 +87,7 @@ const PrivacyPolicy = () => {
         <section>
           <h2>9. Contact Us</h2>
           <p>If you have any questions about our privacy practices or this policy, please contact us at:</p>
-          <p>Email: support@cmmsgo.com</p>
-          <p>Phone: +91-XXXX-XXXXXX</p>
+          <p>Email: nissicmms@nissi.co.in</p>
         </section>
       </main>
     </div>

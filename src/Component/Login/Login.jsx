@@ -3,18 +3,20 @@ import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import axios from 'axios';
 import { useDispatch } from "react-redux";
-import { setUsers,setAuth,setRole } from '../../store/slice';
+import { setUsers,setAuth,setRole, setUsersRoles } from '../../store/slice';
 import logoImage from './logo.png';
 const Login = () => {
   const navigate = useNavigate();
   const dispatch =useDispatch()
+
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
-   // State for loading spinner
-  
+  const [emp,setEmp]=useState()
+  const [userRole,setUsersRole]=useState()
+  // State for loading spinner
    const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
     setError('');
@@ -22,6 +24,10 @@ const Login = () => {
     setLoading(true); // Show loading spinner
     try {
         const user = data?.find((user) => user.email === email && user.password === password);
+     
+        const findUser= emp?.find((user)=>user.email === email)?.role
+        const findRole=userRole.find(user=>user.name === findUser)
+        
         if (user) {
             localStorage.setItem('role', user.role);
             localStorage.setItem('auth', true);
@@ -30,7 +36,12 @@ const Login = () => {
             dispatch(setRole(user?.role));
             dispatch(setUsers(user));
             dispatch(setAuth(true));
+             if(user.role ==='user')
+             {
 
+              dispatch(setUsersRoles(findRole))
+
+             }
             navigate('/dashboard');
         } else {
             setError('Invalid email or password');
@@ -48,6 +59,7 @@ const Login = () => {
         headers: { 'Cache-Control': 'no-cache' },
       });
       setData(response.data);
+   
     } catch (err) {
       console.error("Error fetching data:", err);
       setData(null); // Clear state on failure
@@ -55,11 +67,37 @@ const Login = () => {
       setLoading(false);
     }
   };
+  const getEmployee=async ()=>{
+    try{
+      const response= await axios.get('https://cmms-backend-1.onrender.com/api/emp/get')
+      setEmp(response.data)
+    }catch (err) {
+      console.error("Error fetching data:", err);
+      setEmp(null); 
+    }
   
+
+  }
+  const getUserDetails=async ()=>{
+    try{
+      const response= await axios.get('https://cmms-backend-1.onrender.com/api/roles')
+      const parsedRoles = response.data.map(role => ({
+        ...role,
+        permissions: JSON.parse(role.permissions) // Parsing the permissions JSON string to an object
+      }));
+      setUsersRole(parsedRoles);
+    }catch (err) {
+      console.error("Error fetching data:", err);
+      setEmp(null); 
+    }
+  
+
+  }
 
   useEffect(() => {
     getDate();
-    
+    getEmployee()
+    getUserDetails()
 },[]);
 
   return (

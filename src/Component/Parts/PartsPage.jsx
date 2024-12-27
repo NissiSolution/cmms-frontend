@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import './PartsPage.css';
 import SidebarComponent from "../sidebar/SidebarComponent";
-
+import { useSelector } from "react-redux";
 const PartsPage = () => {
   const [assets, setAssets] = useState([]);
   const [recentStockOuts, setRecentStockOuts] = useState([]);
@@ -11,7 +11,7 @@ const PartsPage = () => {
   const [subtractQuantity, setSubtractQuantity] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
+ const role=localStorage.getItem('role')
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -131,7 +131,26 @@ const PartsPage = () => {
       );
     }
   };
+  const userRole=useSelector((state)=>state?.user.userRole)
+  
+  const checkAllPermissions = (userRole, module, action) => {
+    if (!userRole || !userRole.permissions) return false; // Return false if no permissions
+  
+    // Check if the module exists and includes the action
+    return userRole.permissions[module]?.includes(action) || false;
+  }; 
 
+  // const hasPermissionEdit=checkAllPermissions(userRole,'edit')
+  // const hasPermissionView=checkAllPermissions(userRole,'view')
+  
+  const hasPermissionDelete=checkAllPermissions(userRole,'stockOut','delete')
+  const hasPermissionAdd=checkAllPermissions(userRole,'stockOut','add')
+
+
+  const canAdd = hasPermissionAdd || (role === 'admin' || role === 'companyAdmin');
+  // const canEdit=hasPermissionEdit || (role === 'admin' || role === 'companyAdmin');
+  // const canView=hasPermissionView || (role ==='admin' || role ==='companyAdmin')
+  const canDelete=hasPermissionDelete ||(role ==='admin' || role==='companyAdmin') 
   return (
     <div className="StockOut-page">
       <SidebarComponent />
@@ -142,7 +161,7 @@ const PartsPage = () => {
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
         {successMessage && <p className="success-message">{successMessage}</p>}
-
+      {canAdd&&(<>
         <div className="stock-out-form">
           <label>
             <span>Select Asset:</span>
@@ -187,6 +206,9 @@ const PartsPage = () => {
             Update Stock
           </button>
         </div>
+      
+      </>)}
+        
 
         <div className="recent-stock-outs">
           <h2>Recent Stock-Outs</h2>
@@ -197,7 +219,10 @@ const PartsPage = () => {
     <p>Quantity: {stockOut.stock}</p>
     <p>Remark: {stockOut.remark}</p>
     <p>Date: {formatDate(stockOut.created_at)}</p>
-    <button className="dlt-btn" onClick={() => handleDeleteStockOut(stockOut)}>Delete</button>
+       {canDelete&&(<>
+        <button className="dlt-btn" onClick={() => handleDeleteStockOut(stockOut)}>Delete</button>
+       
+       </>)}
   </div>
 ))}
           </div>

@@ -27,7 +27,7 @@ const AboutUs = () => {
         <div className="about-us-container">
           <h2>About Us</h2>
           <p>
-            Welcome to CMMSGO! At CMMSGO, we strive to provide robust solutions for 
+            Welcome to Nissi CMMS! At CMMS, we strive to provide robust solutions for 
             modern facility and maintenance management needs. 
             Our mission is to empower organizations to efficiently manage 
             operations with innovative and user-friendly tools.

@@ -24,11 +24,11 @@ const TermsAndConditions = () => {
       </header>
       <main className="terms-content">
         <h1>Terms and Conditions</h1>
-        <p>Welcome to CMMSGO. Below are the terms and conditions governing your use of our services and website. By accessing or using our services, you agree to these terms.</p>
+        <p>Welcome to Nissi CMMS. Below are the terms and conditions governing your use of our services and website. By accessing or using our services, you agree to these terms.</p>
         
         <section>
           <h2>1. Acceptance of Terms</h2>
-          <p>By using CMMSGO, you agree to comply with and be bound by the following terms and conditions. If you do not agree, please refrain from using our services.</p>
+          <p>By using Nissi CMMS, you agree to comply with and be bound by the following terms and conditions. If you do not agree, please refrain from using our services.</p>
         </section>
         
         <section>
@@ -43,7 +43,7 @@ const TermsAndConditions = () => {
         
         <section>
           <h2>4. Limitation of Liability</h2>
-          <p>CMMSGO is not liable for any indirect or consequential damages resulting from the use of our services. We do not guarantee uninterrupted or error-free service.</p>
+          <p>Nissi CMMS is not liable for any indirect or consequential damages resulting from the use of our services. We do not guarantee uninterrupted or error-free service.</p>
         </section>
         
         <section>
@@ -59,8 +59,7 @@ const TermsAndConditions = () => {
         <section>
           <h2>7. Contact Us</h2>
           <p>If you have any questions or concerns regarding these terms, please contact us at:</p>
-          <p>Email: support@cmmsgo.com</p>
-          <p>Phone: +91-XXXX-XXXXXX</p>
+          <p>Email: nissicmms@nissi.co.in</p>
         </section>
       </main>
     </div>

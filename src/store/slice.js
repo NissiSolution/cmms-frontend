@@ -6,6 +6,7 @@ export const Slice = createSlice({
         users: localStorage.getItem('users') || null, // Read from local storage
         role: localStorage.getItem('role') || null,
         auth: localStorage.getItem('auth') === 'true', // Convert to boolean
+        userRole:[],
     },
     reducers: {
         setAuth: (state, action) => {
@@ -27,9 +28,15 @@ export const Slice = createSlice({
         setRole: (state, action) => {
             state.role = action.payload;
             localStorage.setItem('role', action.payload); // Persist to local storage
+        },
+        setUsersRoles:(state,action)=>{
+            state.userRole=action.payload
+        },
+        clearUsersRoles:(state,action)=>{
+            state.userRole=null
         }
     }
 });
 
-export const { setUsers, clearUsers, setRole, setAuth, removeAuth } = Slice.actions;
+export const { setUsers, clearUsers, setRole, setAuth, removeAuth,setUsersRoles,clearUsersRoles } = Slice.actions;
 export default Slice.reducer;
