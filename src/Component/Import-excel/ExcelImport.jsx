@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import Select from 'react-select';
 import './ExcelImport.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import SidebarComponent from '../sidebar/SidebarComponent';
 import axios from 'axios';
 
 const ExcelImport = () => {
   const [data, setData] = useState([]);
   const location = useLocation();
+  const navigate=useNavigate()
   const { title } = location.state || {};
 
   const asset = [
@@ -101,6 +102,7 @@ const ExcelImport = () => {
 
           if (response.data.message) {
             console.log('Employee created successfully:', response.data.message);
+            navigate('/employee')
           } else {
             console.error('Error creating employee:', response.data.error);
           }
@@ -122,6 +124,7 @@ const ExcelImport = () => {
 
           if (response.status === 200 || response.status === 201) {
             console.log('Asset added/updated successfully');
+            navigate('/stock')
           } else {
             console.error('Error submitting asset data:', response.data.error);
           }

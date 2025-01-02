@@ -26,7 +26,7 @@ const Login = () => {
         const user = data?.find((user) => user.email === email && user.password === password);
      
         const findUser= emp?.find((user)=>user.email === email)?.role
-        const findRole=userRole.find(user=>user.name === findUser)
+        const findRole=userRole?.find(user=>user.name === findUser)
         
         if (user) {
             localStorage.setItem('role', user.role);
