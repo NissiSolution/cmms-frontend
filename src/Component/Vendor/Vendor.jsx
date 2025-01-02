@@ -32,7 +32,6 @@ const Vendor = () => {
   
  const hasPermissionDelete=checkAllPermissions(userRole,'vendor','delete')
   const hasPermissionAdd=checkAllPermissions(userRole,'vendor','add')
-console.log(userRole);
 
 
   const canAdd = hasPermissionAdd || (role === 'admin' || role === 'companyAdmin');

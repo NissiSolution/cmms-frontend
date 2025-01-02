@@ -59,9 +59,26 @@ const formatDate = (dateString) => {
   return `${day}-${month}-${year}`;
 };
 
- const attendanceToday=attendance?.filter(att=>(
-  formatDate(att.date)===formattedDate
- ))
+const attendanceToday = attendance?.filter(att => (
+  formatDate(att.date) === formattedDate
+));
+
+// Create Sets to track unique employee IDs for Present and Absent
+const presentEmployees = new Set();
+const absentEmployees = new Set();
+
+// Iterate through today's attendance and add unique employee IDs to the respective Sets
+attendanceToday?.forEach(att => {
+  if (att.status === 'Present') {
+    presentEmployees.add(att.employee_id); // Assuming each attendance record has an employeeId
+  } else if (att.status === 'Absent') {
+    absentEmployees.add(att.employee_id); // Assuming each attendance record has an employeeId
+  }
+});
+
+// The number of unique employees present and absent today
+const totalPresentToday = presentEmployees.size;
+const totalAbsentToday = absentEmployees.size;
 
 
   const lineChartData = {
@@ -195,7 +212,11 @@ const formatDate = (dateString) => {
               </div>
               <div className="stat-card">
                 <h3>Total Employee Present Today</h3>
-                <p>{attendanceToday?.length||20}</p>
+                <p>{totalPresentToday||0}</p>
+              </div>
+              <div className="stat-card">
+                <h3>Total Employee Absent Today</h3>
+                <p>{totalAbsentToday||0}</p>
               </div>
             </section>
             <section className="chart-section">
@@ -207,7 +228,7 @@ const formatDate = (dateString) => {
         <section className="dashboard-stats">
               <div className="stat-card blue">
                <h3>Total Assign Work Order</h3>
-               <p>{getUserDetails?.length}</p>
+               <p>{getUserDetails?.length||4}</p>
               </div>
               <div className="stat-card blue">
                 <h3>Total Open Work Order</h3>

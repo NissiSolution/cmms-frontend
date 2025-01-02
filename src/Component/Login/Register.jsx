@@ -21,10 +21,10 @@ const navigate=useNavigate()
         },
         withCredentials: true
       });
-      if (response.status===200)
+      if (response)
       {
+        alert('login successful')
         navigate('/')
-
       }
     } catch (err) {
       console.error(err);
@@ -77,7 +77,7 @@ const navigate=useNavigate()
               <button type="submit" className="register-button">Register</button>
             </form>
 
-            <p>Already have an account? <a href="/">Login</a></p>
+            <p>Already have an account? <Link to="/">Login</Link></p>
           </div>
         </div>
       </main>

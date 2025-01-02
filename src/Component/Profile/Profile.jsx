@@ -9,7 +9,6 @@ const Profile = () => {
   const [current,setCurrent]=useState()
   const [newPassword,setNewPassword]=useState()
   const [confirmPassword,setConfirmPassword]=useState()
-  console.log(userValue.id)
 
   const handlePasswordChange = async (e)   => {
     e.preventDefault();
@@ -25,13 +24,12 @@ return;
     }
 
    try{
-    const response= await axios.put(`https://cmms-backend-1.onrender.com/api/pass/${userValue?.id}`, {newPassword}, {
+     await axios.put(`https://cmms-backend-1.onrender.com/api/pass/${userValue?.id}`, {newPassword}, {
       headers: {
         'Content-Type': 'application/json',
       },
       withCredentials: true
     });
-    console.log(response.data);
     setCurrent('')
     setConfirmPassword('')
     setNewPassword('')

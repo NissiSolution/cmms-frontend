@@ -36,7 +36,6 @@ const RolesPage = () => {
     fetchRoles();
   }, [roles]);
   
-console.log(roles);
 
   // Modal Control
   const openModal = () => setIsModalOpen(true);
@@ -68,7 +67,6 @@ console.log(roles);
 
   // Handle Submit to add a new role
   const handleSubmit = async (e) => {
-    console.log(newRole.name);
     
     e.preventDefault();
     try {
@@ -77,7 +75,6 @@ console.log(roles);
             name:newRole.name,
             permissions:newRole.permissions,
           }
-          console.log(data);
           
         await axios.post('https://cmms-backend-1.onrender.com/api/roles/post',data, {
           headers: {

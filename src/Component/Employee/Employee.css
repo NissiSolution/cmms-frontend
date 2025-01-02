@@ -103,6 +103,11 @@
     align-items: center;
     z-index: 999;
   }
+  .department{
+    font-size: 17px;
+    font-weight: bold;
+    color: whitesmoke;
+  }
   
   .modal {
     background-color: white;

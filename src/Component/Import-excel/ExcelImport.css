@@ -1,0 +1,71 @@
+.excelimport {
+  display: flex;
+}
+
+.main-content {
+  background: rgba(255, 255, 255, 0.1); /* Slightly transparent background for main content */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.table-container {
+  max-height: 350px; /* Set a max height for the table */
+  overflow-y: auto; /* Enable vertical scrolling */
+  margin-top: 20px;
+  background-color: rgba(255, 255, 255, 0.8); /* Light background for the table */
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.table-container .excel {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container .excel th,
+.table-container .excel td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd; /* Light border for table cells */
+}
+
+.table-container .excel th {
+  background-color: #2f588a; /* Header background color */
+  color: white; /* Header text color */
+}
+
+.table-container .excel td {
+  background-color: #f9f9f9; /* Cell background color */
+}
+
+.dropdown-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.dropdown-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dropdown-wrapper label {
+  margin-bottom: 5px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.main-content  .ex-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: navy; /* Button background color */
+  color: white; /* Button text color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.main-content .ex-btn:hover {
+  background-color: #1e3a6d; /* Darker shade on hover */
+}

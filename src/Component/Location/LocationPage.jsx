@@ -1,53 +1,76 @@
-import React, { useState } from 'react';
+import axios from 'axios'; // Import Axios
+import React, { useState, useEffect } from 'react';
 import SidebarComponent from '../sidebar/SidebarComponent';
 import './LocationPage.css';
-import { FaEdit } from 'react-icons/fa'; // Edit icon
-import { FaTrashAlt } from 'react-icons/fa'; // Delete icon
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 
 const LocationPage = () => {
-  const [locations, setLocations] = useState([
-    { name: 'location1', address: 'First Location' },
-    { name: 'location 2', address: 'location 2' },
-    { name: 'location2', address: 'location2' },
-    { name: 'location3', address: 'location3' },
-  ]);
-
+  const [locations, setLocations] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState({ name: '', address: '' });
   const [editIndex, setEditIndex] = useState(null);
+  const role=localStorage.getItem('role')
+  // Fetch Locations from API
+  useEffect(() => {
+    axios
+      .get('https://cmms-backend-1.onrender.com/api/location')
+      .then((response) => setLocations(response.data))
+      .catch((err) => console.error('Error fetching locations:', err));
+  }, []);
 
-  // Modal Handlers
+  // Open Modal
   const openModal = (location = { name: '', address: '' }, index = null) => {
     setCurrentLocation(location);
     setEditIndex(index);
     setIsModalOpen(true);
   };
 
+  // Close Modal
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentLocation({ name: '', address: '' });
     setEditIndex(null);
   };
 
-  // Form Submission
+  // Add or Edit Location
   const handleSubmit = (e) => {
     e.preventDefault();
-    const updatedLocations = [...locations];
 
     if (editIndex !== null) {
-      updatedLocations[editIndex] = currentLocation; // Edit location
+      // Update Existing Location
+      const locationId = locations[editIndex].id;
+      axios
+        .put(`https://cmms-backend-1.onrender.com/api/locations/${locationId}`, currentLocation)
+        .then(() => {
+          const updatedLocations = [...locations];
+          updatedLocations[editIndex] = { ...currentLocation, id: locationId };
+          setLocations(updatedLocations);
+          closeModal();
+        })
+        .catch((err) => console.error('Error updating location:', err));
     } else {
-      updatedLocations.push(currentLocation); // Add new location
+      // Add New Location
+      axios
+        .post('https://cmms-backend-1.onrender.com/api/location/post', currentLocation)
+        .then((response) => {
+          setLocations([...locations, { ...currentLocation, id: response.data.id }]);
+          closeModal();
+        })
+        .catch((err) => console.error('Error adding location:', err));
     }
-
-    setLocations(updatedLocations);
-    closeModal();
   };
 
-  // Delete Action
+  // Delete Location
   const handleDelete = (index) => {
-    const updatedLocations = locations.filter((_, i) => i !== index);
-    setLocations(updatedLocations);
+    const locationId = locations[index].id;
+
+    axios
+      .delete(`https://cmms-backend-1.onrender.com/api/locations/dlt/${locationId}`)
+      .then(() => {
+        const updatedLocations = locations.filter((_, i) => i !== index);
+        setLocations(updatedLocations);
+      })
+      .catch((err) => console.error('Error deleting location:', err));
   };
 
   return (
@@ -57,9 +80,12 @@ const LocationPage = () => {
       <div className="main-content">
         <header className="header">
           <h1>Manage Locations</h1>
-          <button className="add-btn" onClick={() => openModal()}>
-            + Create Location
-          </button>
+          {role!=='user'&&(
+  <button className="add-btn" onClick={() => openModal()}>
+  + Create Location
+</button>
+          )}
+        
         </header>
 
         {/* Location Table */}
@@ -68,7 +94,11 @@ const LocationPage = () => {
             <tr>
               <th>NAME</th>
               <th>ADDRESS</th>
-              <th>ACTION</th>
+              {role!=='user'&&
+              (
+                <th>ACTION</th>
+
+              )}
             </tr>
           </thead>
           <tbody>
@@ -76,14 +106,18 @@ const LocationPage = () => {
               <tr key={index}>
                 <td>{location.name}</td>
                 <td>{location.address}</td>
-                <td>
-                  <button className="action-btn edit" onClick={() => openModal(location, index)}>
-                    <FaEdit /> Edit
-                  </button>
-                  <button className="action-btn delete" onClick={() => handleDelete(index)}>
-                    <FaTrashAlt /> Delete
-                  </button>
-                </td>
+                {role!=='user'&&(
+                   <td>
+              
+                   <button className="action-btn edit" onClick={() => openModal(location, index)}>
+                     <FaEdit /> Edit
+                   </button>
+                   <button className="action-btn delete" onClick={() => handleDelete(index)}>
+                     <FaTrashAlt /> Delete
+                   </button>
+                 </td>
+                )}
+               
               </tr>
             ))}
           </tbody>

@@ -17,6 +17,7 @@ import PrivacyPolicy from './Component/PrivacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './Component/TermsAndConditions/TermsAndConditions';
 import Add from './Component/AddStock/Add';
 import RolesPage from './Component/Rolepage/RolePage';
+import ExcelImport from './Component/Import-excel/ExcelImport';
 
 function App() {
   const auth = useSelector((state) => state.user?.auth);
@@ -53,6 +54,7 @@ function App() {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['admin', 'user', 'companyAdmin']} />}>
         <Route path='/add-stock' element={<Add />} />
+        <Route  path='/excel-add' element={<ExcelImport/>}/>
         <Route path='/stock-out' element={<PartsPage />} />
          </Route>
 

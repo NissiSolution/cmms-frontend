@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Employee.css';
 import SidebarComponent from '../sidebar/SidebarComponent';
 import axios from 'axios';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -12,7 +12,7 @@ const Employee = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState({});
   const [editIndex, setEditIndex] = useState(null);
-  const [editID,setEditId]=useState()
+  const [editID, setEditId] = useState();
   const [workOrders, setWorkOrders] = useState([]);
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [attendanceStatus, setAttendanceStatus] = useState('Present');
@@ -22,7 +22,10 @@ const Employee = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
   const [empPhoto, setEmpPhoto] = useState(null); // State for employee photo
-  const [roles,setRoles]=useState()
+  const [roles, setRoles] = useState();
+  const [departments, setDepartments] = useState([]); // State for unique departments
+  const [selectedDepartment, setSelectedDepartment] = useState(''); // State for selected department
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -30,16 +33,18 @@ const Employee = () => {
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
   };
-  const getRole= async()=>{
-    const response=await axios.get('https://cmms-backend-1.onrender.com/api/roles',{
+
+  const getRole = async () => {
+    const response = await axios.get('https://cmms-backend-1.onrender.com/api/roles', {
       withCredentials: true,
-    })
+    });
     const parsedRoles = response.data.map(role => ({
       ...role,
       permissions: typeof role.permissions === "string" ? JSON.parse(role.permissions) : role.permissions,
     }));
     setRoles(parsedRoles);
-  }
+  };
+
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
     setSelectedDate(today);
@@ -51,14 +56,18 @@ const Employee = () => {
         setEmployees(employeeResponse.data);
         await fetchRecentWorkOrders();
         await getAttendance();
+
+        // Extract unique departments
+        const uniqueDepartments = [...new Set(employeeResponse.data.map(emp => emp.department))];
+        setDepartments(uniqueDepartments);
       } catch (err) {
         console.error('Error fetching employees:', err);
       }
     };
 
     fetchEmployees();
-     getRole()
-  }, [employees]);
+    getRole();
+  }, []);
 
   const fetchRecentWorkOrders = async () => {
     try {
@@ -71,23 +80,21 @@ const Employee = () => {
     }
   };
 
-  const openModal = (employee={},index=null) => {
-  
+  const openModal = (employee = {}, index = null) => {
     setEditIndex(index);
     setIsModalOpen(true);
     setEmpPhoto(null); // Reset photo state when opening modal
     if (employee) {
       setCurrentEmployee(employee);
-
       const foundEmployee = employees?.find(emp => emp.emp_id === employee.emp_id);
       if (foundEmployee) {
-          setEditId(foundEmployee?.id);
+        setEditId(foundEmployee?.id);
       } else {
-          setEditId(null);
+        setEditId(null);
       }
-  } else {
+    } else {
       setEditId(null); 
-  }
+    }
   };
 
   const closeModal = () => {
@@ -106,131 +113,124 @@ const Employee = () => {
     if (name === 'emp_id') {
       checkUniqueEmpId(value);
     }
-
   };
+
   const checkUniqueEmpId = (empId) => {
     const isUniqueId = !employees.some((employee) => employee.emp_id === empId);
     setIsUnique(isUniqueId);
   };
+
   const [isUnique, setIsUnique] = useState(true);
 
   const handlePhotoChange = (e) => {
     setEmpPhoto(e.target.files[0]); // Set the selected file
   };
 
-console.log(currentEmployee.role);
-
-
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(); // Create a FormData object
 
     // Check if we are editing or creating
     if (editIndex !== null) {
-        // Update existing employee
+      // Update existing employee
+      if (!editID) {
+        console.error("Employee not found");
+        return;
+      }
 
-        if (!editID) {
-            console.error("Employee not found");
-            return;
+      // Append employee data to FormData
+      formData.append('_method', 'PUT'); // Simulate PUT request for PHP
+      formData.append('id', editID); // Include the employee ID
+      formData.append('name', currentEmployee.name);
+      formData.append('emp_id', currentEmployee.emp_id);
+      formData.append('department', currentEmployee.department);
+      formData.append('dateofjoin', currentEmployee.dateofjoin);
+      formData.append('skillset', currentEmployee.skillset);
+      formData.append('email', currentEmployee.email);
+      formData.append('phone', currentEmployee.phone);
+      formData.append('password', currentEmployee.password);
+      formData.append('role', currentEmployee.role);
+
+      if (empPhoto) {
+        formData.append('emp_photo', empPhoto); // Include photo if provided
+      }
+
+      try {
+        const response = await axios.post(
+          'https://nissicmms.digidiary.in/api/emp_api.php',
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
+        if (response.data.message) {
+          // Update the employees state with the new data
+          const updatedEmployees = [...employees];
+          updatedEmployees[editIndex] = { ...editID, ...currentEmployee };
+          setEmployees(updatedEmployees);
+          console.log("Employee updated successfully");
+        } else {
+          console.error('Error updating employee:', response.data.error);
         }
-
-        // Append employee data to FormData
-        formData.append('_method', 'PUT'); // Simulate PUT request for PHP
-        formData.append('id', editID); // Include the employee ID
-        formData.append('name', currentEmployee.name);
-        formData.append('emp_id', currentEmployee.emp_id);
-        formData.append('department', currentEmployee.department);
-        formData.append('dateofjoin', currentEmployee.dateofjoin);
-        formData.append('skillset', currentEmployee.skillset);
-        formData.append('email', currentEmployee.email);
-        formData.append('phone', currentEmployee.phone);
-        formData.append('password', currentEmployee.password);
-        formData.append('role',currentEmployee.role)
-
-        if (empPhoto) {
-            formData.append('emp_photo', empPhoto); // Include photo if provided
-        }
-
-        try {
-            const response = await axios.post(
-                'https://nissicmms.digidiary.in/api/emp_api.php',
-                formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
-
-
-            if (response.data.message) {
-                // Update the employees state with the new data
-                const updatedEmployees = [...employees];
-                updatedEmployees[editIndex] = { ...editID, ...currentEmployee };
-                setEmployees(updatedEmployees);
-                console.log("Employee updated successfully");
-            } else {
-                console.error('Error updating employee:', response.data.error);
-            }
-        } catch (error) {
-            console.error("Error updating employee:", error);
-        }
+      } catch (error) {
+        console.error("Error updating employee:", error);
+      }
     } else {
-        // Create new employee
-        // Append employee data to FormData
-        formData.append('name', currentEmployee.name);
-        formData.append('emp_id', currentEmployee.emp_id);
-        formData.append('department', currentEmployee.department);
-        formData.append('dateofjoin', currentEmployee.dateofjoin);
-        formData.append('skillset', currentEmployee.skillset);
-        formData.append('email', currentEmployee.email);
-        formData.append('phone', currentEmployee.phone);
-        formData.append('password', currentEmployee.password);
-        formData.append('role',currentEmployee.role)
+      // Create new employee
+      // Append employee data to FormData
+      formData.append('name', currentEmployee.name);
+      formData.append('emp_id', currentEmployee.emp_id);
+      formData.append('department', currentEmployee.department);
+      formData.append('dateofjoin', currentEmployee.dateofjoin);
+      formData.append('skillset', currentEmployee.skillset);
+      formData.append('email', currentEmployee.email);
+      formData.append('phone', currentEmployee.phone);
+      formData.append('password', currentEmployee.password);
+      formData.append('role', currentEmployee.role);
+      
+      if (empPhoto) {
+        formData.append('emp_photo', empPhoto); // Include photo if provided
+      }
 
-        if (empPhoto) {
-            formData.append('emp_photo', empPhoto); // Include photo if provided
+      try {
+        const response = await axios.post(
+          'https://nissicmms.digidiary.in/api/emp_api.php',
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
+        const data = {
+          name: currentEmployee.name,
+          email: currentEmployee.email,
+          password: currentEmployee.password,
+          role: 'user'
+        };
+
+        if (response.data.message) {
+          // Add the new employee to the state
+          setEmployees(prev => [...prev, response.data]);
+          console.log("Employee created successfully");
+
+          await axios.post("https://cmms-backend-1.onrender.com/api/post", data, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            withCredentials: true
+          });
+        } else {
+          console.error('Error creating employee:', response.data.error);
         }
-
-        try {
-            const response = await axios.post(
-                'https://nissicmms.digidiary.in/api/emp_api.php',
-                formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
-
-
-            console.log(response.data);
-              const data={
-                name:currentEmployee.name,
-                email:currentEmployee.email,
-                password:currentEmployee.password,
-                role:'user'
-              }
-            if (response.data.message) {
-                // Add the new employee to the state
-                setEmployees(prev => [...prev, response.data]);
-                console.log("Employee created successfully");
-
-
-                 await axios.post("https://cmms-backend-1.onrender.com/api/post", data, {
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  withCredentials: true
-                })
-
-            } else {
-                console.error('Error creating employee:', response.data.error);
-            }
-        } catch (error) {
-            console.error("Error creating employee:", error);
-        }
+      } catch (error) {
+        console.error("Error creating employee:", error);
+      }
     }
 
     // Close the modal after submission
     closeModal();
-};
+  };
 
   const openAttendanceModal = (employeeId) => {
     setSelectedEmployeeId(employeeId);
@@ -270,7 +270,6 @@ const handleSubmit = async (e) => {
     }
   };
 
-
   const openAttendancePopup = () => {
     setIsAttendancePopupOpen(true);
   };
@@ -284,7 +283,9 @@ const handleSubmit = async (e) => {
     setIsDetailsModalOpen(false);
     setSelectedEmployeeDetails({});
   };
-const navigate=useNavigate();
+
+  const navigate = useNavigate();
+
   return (
     <div className="employee-page">
       <SidebarComponent />
@@ -292,7 +293,10 @@ const navigate=useNavigate();
         <header className="header">
           <h1>Employee</h1>
           <div>
-          <button className="add-btn role-btn" onClick={() => navigate('/role') }>
+            <button className="add-btn role-btn" onClick={() => navigate('/excel-add', { state: { title: 'Employee' } })}>
+              + Add Using Excel
+            </button>
+            <button className="add-btn role-btn" onClick={() => navigate('/role')}>
               + Add Role
             </button>
             <button className="add-btn" onClick={() => openModal()}>
@@ -313,6 +317,21 @@ const navigate=useNavigate();
           />
         </div>
 
+        {/* Dropdown for Department Filtering */}
+        <div className="department-filter">
+          <label htmlFor="department" className='department'>Filter by Department:</label>
+          <select
+            id="department"
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+          >
+            <option value="">All Departments</option>
+            {departments.map((dept, index) => (
+              <option key={index} value={dept}>{dept}</option>
+            ))}
+          </select>
+        </div>
+
         <div className="employee-table">
           <table>
             <thead>
@@ -330,10 +349,12 @@ const navigate=useNavigate();
             <tbody>
               {employees
                 ?.filter(employee => {
-                  const lowerCaseQuery = searchQuery?.toLowerCase();                  
+                  const lowerCaseQuery = searchQuery?.toLowerCase();
+                  const isDepartmentMatch = selectedDepartment ? employee.department === selectedDepartment : true;
                   return (
-                   ( employee.name &&employee.name.toLowerCase()?.includes(lowerCaseQuery)) ||
-                    (employee.emp_id &&employee.emp_id.toLowerCase()?.includes(lowerCaseQuery))
+                    isDepartmentMatch &&
+                    ((employee.name && employee.name.toLowerCase()?.includes(lowerCaseQuery)) ||
+                    (employee.emp_id && employee.emp_id.toLowerCase()?.includes(lowerCaseQuery)))
                   );
                 })
                 ?.map((employee, index) => {
@@ -341,13 +362,13 @@ const navigate=useNavigate();
                   const recentWorkOrder = assignedWorkOrder ? assignedWorkOrder.name : 'N/A';
 
                   const todayDate = new Date().toISOString().split('T')[0];
-                  const att = attendance?.filter(att => att.employee_id === employee.id);
+                  const att = attendance?.filter(att => att.employee_id === employee.id );
                   const todayAttendance = att?.find(record => formatDate(record.date) === todayDate);
                   const sta = todayAttendance ? todayAttendance.status : 'Absent';
 
                   return (
                     <tr key={employee.id}>
-                      <td className='slno'>{index+1}</td>
+                      <td className='slno'>{index + 1}</td>
                       <td className='name'>{employee.name}</td>
                       <td>{employee.emp_id}</td>
                       <td>{employee.department}</td>
@@ -400,8 +421,8 @@ const navigate=useNavigate();
                 />
               </label>
               {!isUnique && (
-        <p style={{ color: 'red' }}>This Employee ID is already in use. Please choose a unique ID.</p>
-      )}
+                <p style={{ color: 'red' }}>This Employee ID is already in use. Please choose a unique ID.</p>
+              )}
               <label>
                 Department:
                 <input
@@ -433,24 +454,23 @@ const navigate=useNavigate();
                 />
               </label>
               <label>
-  Set Role:
-  <select
-    name="role"
-    value={currentEmployee.role || ''}
-    onChange={handleInputChange}
-    required
-  >
-    <option value="" disabled>
-      Select Role
-    </option>
-    {roles?.map((emp) => (
-      <option key={emp.id} value={emp.name}>
-        {emp.name}
-      </option>
-    ))}
-  </select>
-</label>
-
+                Set Role:
+                <select
+                  name="role"
+                  value={currentEmployee.role || ''}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="" disabled>
+                    Select Role
+                  </option>
+                  {roles?.map((emp) => (
+                    <option key={emp.id} value={emp.name}>
+                      {emp.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <label>
                 Email:
                 <input
@@ -471,18 +491,18 @@ const navigate=useNavigate();
                   required
                 />
               </label>
-              {editIndex===null && (
-          <label>
-            Create Password:
-            <input
-              type="password"
-              name="password"
-              value={currentEmployee.password || ''}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
-        )}
+              {editIndex === null && (
+                <label>
+                  Create Password:
+                  <input
+                    type="password"
+                    name="password"
+                    value={currentEmployee.password || ''}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </label>
+              )}
               <label>
                 Employee Photo:
                 <input
@@ -509,7 +529,7 @@ const navigate=useNavigate();
       {isAttendanceModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
-          <h2>Mark Attendance</h2>
+            <h2 >Mark Attendance</h2>
             <p>Select attendance status for this employee:</p>
             <div className="attendance-options">
               <label>
@@ -601,7 +621,7 @@ const navigate=useNavigate();
                       <tr key={index}>
                         <td>{employeeName}</td>
                         <td>{trimmedDate}</td>
-                        <td className={`${record.status==='Present'?'present':'absent'}`}>{record.status}</td>
+                        <td className={`${record.status === 'Present' ? 'present' : 'absent'}`}>{record.status}</td>
                       </tr>
                     );
                   })}
@@ -617,38 +637,37 @@ const navigate=useNavigate();
 
       {/* Modal for Viewing Employee Details */}
       {isDetailsModalOpen && (
-  <div className="modal-overlay">
-    <div className="modal emp_model">
-      <h2>Employee Details</h2>
-      <div className="employee-details">
-        <div className="details-left">
-          <p><strong>Name:</strong> {selectedEmployeeDetails.name}</p>
-          <p><strong>Employee ID:</strong> {selectedEmployeeDetails.emp_id}</p>
-          <p><strong>Department:</strong> {selectedEmployeeDetails.department}</p>
-          <p><strong>Date of Join:</strong> {formatDate(selectedEmployeeDetails.dateofjoin)}</p>
-          <p><strong>Skillset:</strong> {selectedEmployeeDetails.skillset}</p>
-          <p><strong>Email:</strong> {selectedEmployeeDetails.email}</p>
-          <p><strong>Phone:</strong> {selectedEmployeeDetails.phone}</p>
+        <div className="modal-overlay">
+          <div className="modal emp_model">
+            <h2>Employee Details</h2>
+            <div className="employee-details">
+              <div className="details-left">
+                <p><strong>Name:</strong> {selectedEmployeeDetails.name}</p>
+                <p><strong>Employee ID:</strong> {selectedEmployeeDetails.emp_id}</p>
+                <p><strong>Department:</strong> {selectedEmployeeDetails.department}</p>
+                <p><strong>Date of Join:</strong> {formatDate(selectedEmployeeDetails.dateofjoin)}</p>
+                <p><strong>Skillset:</strong> {selectedEmployeeDetails.skillset}</p>
+                <p><strong>Email:</strong> {selectedEmployeeDetails.email}</p>
+                <p><strong>Phone:</strong> {selectedEmployeeDetails.phone}</p>
+              </div>
+              <div className="details-right">
+                <figure>
+                  <img 
+                    src={selectedEmployeeDetails.emp_photo 
+                      ? `https://nissicmms.digidiary.in/api/${selectedEmployeeDetails.emp_photo}` 
+                      : `https://nissicmms.digidiary.in/api/uploads/user.png`} // Path to your default profile icon
+                    alt={`${selectedEmployeeDetails.name}`} 
+                    className="employee-photo" 
+                  />
+                </figure>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button onClick={closeDetailsModal}>Close</button>
+            </div>
+          </div>
         </div>
-        <div className="details-right">
-          <figure>
-            <img 
-              src={selectedEmployeeDetails.emp_photo 
-                ? `https://nissicmms.digidiary.in/api/${selectedEmployeeDetails.emp_photo}` 
-                : `https://nissicmms.digidiary.in/api/uploads/user.png`} // Path to your default profile icon
-              alt={`${selectedEmployeeDetails.name}`} 
-              className="employee-photo" 
-            />
-          </figure>
-        </div>
-      </div>
-      <div className="modal-actions">
-        <button onClick={closeDetailsModal}>Close</button>
-      </div>
-      
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }

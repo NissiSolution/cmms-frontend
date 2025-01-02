@@ -73,7 +73,6 @@ const Assets = () => {
 
 
  const userRole=useSelector((state)=>state?.user.userRole)
-  console.log(userRole);
   
   const checkAllPermissions = (userRole, module, action) => {
     if (!userRole || !userRole.permissions) return false; // Return false if no permissions
@@ -89,7 +88,6 @@ const Assets = () => {
  const hasPermissionDelete=checkAllPermissions(userRole,'stock','delete')
   const hasPermissionAdd=checkAllPermissions(userRole,'stock','add')
 
-console.log(hasPermissionView);
 
   const canAdd = hasPermissionAdd || (role === 'admin' || role === 'companyAdmin');
   const canEdit=hasPermissionEdit || (role === 'admin' || role === 'companyAdmin');
@@ -102,9 +100,16 @@ console.log(hasPermissionView);
         <header className="header">
           <h1>Inventory Management</h1>
           {canAdd&&(
+            <>
+          <button className="add-btn" onClick={() => navigate("/excel-add",{state:{title:'Stock'}})}>
+            + Add Asset Using excel
+          </button>
           <button className="add-btn" onClick={() => navigate("/add-stock")}>
             + Add Asset
-          </button>)}
+          </button>
+          
+          </>
+          )}
         </header>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -138,7 +143,7 @@ console.log(hasPermissionView);
                       src={
                         asset.thumbnail
                           ? `https://nissicmms.digidiary.in/api/${asset.thumbnail}`
-                          : "/default-thumbnail.jpg"
+                          : "https://nissicmms.digidiary.in/api/uploads/temp.png"
                       }
                       alt={asset.name}
                       style={{ width: "50px", height: "50px", borderRadius: "5px" }}
@@ -210,7 +215,7 @@ console.log(hasPermissionView);
                 src={
                   currentAsset.thumbnail
                     ? `https://nissicmms.digidiary.in/api/${currentAsset.thumbnail}`
-                    : "/default-thumbnail.jpg"
+                    : "https://nissicmms.digidiary.in/api/temp.png"
                 }
                 alt={currentAsset.name}
                 style={{ width: "150px", borderRadius: "5px" }}

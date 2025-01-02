@@ -17,10 +17,7 @@ const AboutUs = () => {
         <Link to="/terms">Terms and Conditions</Link>
         <Link to="/privacy">Privacy Policy</Link>
         </nav>
-        <select className="language-selector">
-          <option value="en">English</option>
-          <option value="es">Español</option>
-        </select>
+        
       </header>
       {/* Main Content */}
       <main className="about-us-main">

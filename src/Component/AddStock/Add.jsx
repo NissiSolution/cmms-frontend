@@ -17,6 +17,7 @@ const Add = () => {
     thumbnail: "",
     vendor: "", // Add vendorId to the asset state
   });
+
   const [vendors, setVendors] = useState([]); // State to hold vendors
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -67,35 +68,43 @@ const Add = () => {
     setErrorMessage("");
     setSuccessMessage("");
     const formData = new FormData();
-    if (isEditing) {
-      formData.append("id", asset.id);
-    }
-    Object.entries(asset).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-    try {
-      const response = await axios.post(
-        `https://nissicmms.digidiary.in/api/assets_api.php`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
 
-      if (response.status === 200 || response.status === 201) {
-        setSuccessMessage(
-          isEditing ? "Asset updated successfully!" : "Asset added successfully!"
-        );
-        setTimeout(() => navigate("/stock"), 1000);
-      } else {
-        setErrorMessage(response.data.error || "An unknown error occurred.");
-      }
-    } catch (error) {
-      setErrorMessage(
-        error.response?.data?.error || error.message || "An unknown error occurred."
-      );
+    if (isEditing) {
+        formData.append("id", asset.id);
     }
-  };
+
+    Object.entries(asset).forEach(([key, value]) => {
+        if (key === "thumbnail" && !value) {
+            // Skip appending thumbnail if no file is selected
+            return;
+        }
+        formData.append(key, value);
+    });
+
+    try {
+        const response = await axios.post(
+            `https://nissicmms.digidiary.in/api/assets_api.php`,
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+
+        if (response.status === 200 || response.status === 201) {
+            setSuccessMessage(
+                isEditing ? "Asset updated successfully!" : "Asset added successfully!"
+            );
+            setTimeout(() => navigate("/stock"), 1000);
+        } else {
+            setErrorMessage(response.data.error || "An unknown error occurred.");
+        }
+    } catch (error) {
+        setErrorMessage(
+            error.response?.data?.error || error.message || "An unknown error occurred."
+        );
+    }
+};
+
 
   const handleCancel = () => {
     navigate("/stock");
